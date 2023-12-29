@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "ProToType-Lounge": {
+      "commandName": "Executable",
+      "executablePath": "Q:\\SDK\\Godot\\Godot_mono.exe",
+      "commandLineArgs": "--path, --verbose",
+      "workingDirectory": ".",
+      "nativeDebugging": true
+    }
+  }
+}

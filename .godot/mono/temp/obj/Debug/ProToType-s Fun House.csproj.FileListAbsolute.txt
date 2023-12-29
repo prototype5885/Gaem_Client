@@ -1,0 +1,44 @@
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\ProToType-s Fun House.deps.json
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\ProToType-s Fun House.runtimeconfig.json
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\ProToType-s Fun House.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\ProToType-s Fun House.pdb
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\GodotSharp.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\GodotSharpEditor.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ProToType-s Fun House.csproj.AssemblyReference.cache
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ProToType-s Fun House.GeneratedMSBuildEditorConfig.editorconfig
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ProToType-s Fun House.AssemblyInfoInputs.cache
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ProToType-s Fun House.AssemblyInfo.cs
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ProToType-s Fun House.csproj.CoreCompileInputs.cache
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ProToType-s Fun House.csproj.CopyComplete
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ProToType-s Fun House.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\refint\ProToType-s Fun House.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ProToType-s Fun House.pdb
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ProToType-s Fun House.genruntimeconfig.cache
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\obj\Debug\ref\ProToType-s Fun House.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\System.Data.SQLite.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\runtimes\linux-x64\native\SQLite.Interop.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\runtimes\osx-x64\native\SQLite.Interop.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\runtimes\win-x64\native\SQLite.Interop.dll
+Q:\SDK\Godot\projects\ProToType's Fun House\.godot\mono\temp\bin\Debug\runtimes\win-x86\native\SQLite.Interop.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\ProToType-s Fun House.deps.json
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\ProToType-s Fun House.runtimeconfig.json
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\ProToType-s Fun House.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\ProToType-s Fun House.pdb
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\GodotSharp.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\GodotSharpEditor.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\System.Data.SQLite.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\runtimes\linux-x64\native\SQLite.Interop.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\runtimes\osx-x64\native\SQLite.Interop.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\runtimes\win-x64\native\SQLite.Interop.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\bin\Debug\runtimes\win-x86\native\SQLite.Interop.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ProToType-s Fun House.csproj.AssemblyReference.cache
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ProToType-s Fun House.GeneratedMSBuildEditorConfig.editorconfig
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ProToType-s Fun House.AssemblyInfoInputs.cache
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ProToType-s Fun House.AssemblyInfo.cs
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ProToType-s Fun House.csproj.CoreCompileInputs.cache
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ProToType-s Fun House.csproj.CopyComplete
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ProToType-s Fun House.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\refint\ProToType-s Fun House.dll
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ProToType-s Fun House.pdb
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ProToType-s Fun House.genruntimeconfig.cache
+Q:\SDK\Godot\projects\ProToTypeFunHouse\.godot\mono\temp\obj\Debug\ref\ProToType-s Fun House.dll
