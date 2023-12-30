@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="PackedScene" uid="uid://wec1vy3t4ead" path="res://Components/Player.tscn" id="1_jltu5"]
-[ext_resource type="Script" path="res://Scripts/Database.cs" id="2_rgowi"]
+[ext_resource type="Script" path="res://Scripts/Database.cs" id="2_3m5ob"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gxyvs"]
 
@@ -46,4 +46,4 @@ shadow_enabled = true
 autostart = true
 
 [node name="Database" type="Node" parent="."]
-script = ExtResource("2_rgowi")
+script = ExtResource("2_3m5ob")

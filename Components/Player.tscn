@@ -41,6 +41,14 @@ offset_bottom = 493.0
 text = "hrwhwh
 bgbhw"
 
+[node name="Info2" type="Label" parent="HUD"]
+layout_mode = 1
+offset_top = 816.0
+offset_right = 771.0
+offset_bottom = 1309.0
+text = "hrwhwh
+bgbhw"
+
 [node name="Stats" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("5_fq7b4")
