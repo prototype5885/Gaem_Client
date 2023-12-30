@@ -1,6 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=10 format=3 uid="uid://kig6msmcak75"]
 
-[ext_resource type="PackedScene" uid="uid://wec1vy3t4ead" path="res://Components/Player.tscn" id="1_jltu5"]
+[ext_resource type="Script" path="res://Scripts/LoginMenu.cs" id="1_femt1"]
+[ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
 [ext_resource type="Script" path="res://Scripts/Database.cs" id="2_3m5ob"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gxyvs"]
@@ -35,15 +36,224 @@ mesh = SubResource("PlaneMesh_ic4ne")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
 shape = SubResource("ConcavePolygonShape3D_t5kq2")
 
-[node name="Player" parent="." instance=ExtResource("1_jltu5")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0157034, 1.20803, 1.24605)
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.642534, 0.766258, 0, -0.766258, 0.642534, 0, 0, 0)
 shadow_enabled = true
+
+[node name="LoginCamera" type="Camera3D" parent="."]
+transform = Transform3D(0.652694, -0.213502, 0.726917, 0, 0.959472, 0.281806, -0.757622, -0.183933, 0.626241, 5.20114, 1.99064, 4.45588)
+
+[node name="LoginMenu" type="Control" parent="LoginCamera"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_femt1")
+
+[node name="Login" type="Control" parent="LoginCamera/LoginMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -180.0
+offset_right = 360.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_k5sxp")
+
+[node name="Panel" type="Panel" parent="LoginCamera/LoginMenu/Login"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Username" type="LineEdit" parent="LoginCamera/LoginMenu/Login/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -242.0
+offset_top = -127.0
+offset_right = 242.0
+offset_bottom = -74.0
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "Username"
+
+[node name="Password" type="LineEdit" parent="LoginCamera/LoginMenu/Login/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -242.0
+offset_top = -60.0
+offset_right = 242.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "Password"
+secret = true
+
+[node name="Login" type="Button" parent="LoginCamera/LoginMenu/Login/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -67.0
+offset_top = 10.0
+offset_right = 67.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Login"
+
+[node name="Registration" type="Button" parent="LoginCamera/LoginMenu/Login/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -67.0
+offset_top = 75.0
+offset_right = 67.0
+offset_bottom = 129.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Registration"
+
+[node name="Registration" type="Control" parent="LoginCamera/LoginMenu"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -180.0
+offset_right = 360.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="LoginCamera/LoginMenu/Registration"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Username" type="LineEdit" parent="LoginCamera/LoginMenu/Registration/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -242.0
+offset_top = -127.0
+offset_right = 242.0
+offset_bottom = -74.0
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "Username"
+
+[node name="Password" type="LineEdit" parent="LoginCamera/LoginMenu/Registration/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -242.0
+offset_top = -60.0
+offset_right = 242.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "Password"
+secret = true
+
+[node name="Password2" type="LineEdit" parent="LoginCamera/LoginMenu/Registration/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -242.0
+offset_top = 8.0
+offset_right = 242.0
+offset_bottom = 61.0
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "Password again"
+secret = true
+
+[node name="PassNoMatch" type="Label" parent="LoginCamera/LoginMenu/Registration/Panel"]
+visible = false
+layout_mode = 0
+offset_left = 470.0
+offset_top = 254.0
+offset_right = 646.0
+offset_bottom = 277.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "Passwords don't match"
+
+[node name="Register" type="Button" parent="LoginCamera/LoginMenu/Registration/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -67.0
+offset_top = 75.0
+offset_right = 67.0
+offset_bottom = 129.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Register"
+
+[node name="Back" type="Button" parent="LoginCamera/LoginMenu/Registration/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -341.0
+offset_top = 113.0
+offset_right = -207.0
+offset_bottom = 167.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Back
+"
 
 [node name="TimeLoop" type="Timer" parent="."]
 autostart = true
 
 [node name="Database" type="Node" parent="."]
 script = ExtResource("2_3m5ob")
+
+[connection signal="pressed" from="LoginCamera/LoginMenu/Login/Panel/Login" to="LoginCamera/LoginMenu" method="_on_login_pressed"]
+[connection signal="pressed" from="LoginCamera/LoginMenu/Login/Panel/Registration" to="LoginCamera/LoginMenu" method="_on_registration_pressed"]
+[connection signal="pressed" from="LoginCamera/LoginMenu/Registration/Panel/Register" to="LoginCamera/LoginMenu" method="_on_register_pressed"]
+[connection signal="pressed" from="LoginCamera/LoginMenu/Registration/Panel/Back" to="LoginCamera/LoginMenu" method="_on_back_pressed"]
