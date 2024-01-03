@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Security.Cryptography;
+using System.IO;
 
 namespace ProToTypeLounge.Password
 {
@@ -24,5 +25,29 @@ namespace ProToTypeLounge.Password
             string hashedpassword = "1837bc2c546d46c705204cf9f857b90b1dbffd2a7988451670119945ba39a10b";
             return enteredHashedPassword == hashedpassword;
         }
+        //static byte[] EncryptAES256(string plainText, string key, string iv)
+        //{
+        //    using (AesCryptoServiceProvider aesAlg = new AesCryptoServiceProvider())
+        //    {
+        //        aesAlg.Key = Encoding.UTF8.GetBytes(key);
+        //        aesAlg.IV = Encoding.UTF8.GetBytes(iv);
+
+        //        ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+        //        using (MemoryStream msEncrypt = new MemoryStream())
+        //        {
+        //            using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+        //            {
+        //                using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+        //                {
+        //                    swEncrypt.Write(plainText);
+        //                }
+        //            }
+
+        //            return msEncrypt.ToArray();
+        //        }
+        //    }
+        //}
+
     }
 }

@@ -40,15 +40,10 @@ public partial class LoginMenu : Control
         PassNoMatch = RegistrationPanel.GetChild(3) as Label;
         // end
 
-        hide_windows();
+        Visible = false;
         LoginWindow.Visible = true;
-    }
-    void hide_windows()
-    {
-        foreach (Control i in GetChildren())
-        {
-            i.Visible = false;
-        }
+        RegistrationWindow.Visible = false;
+
     }
     void _on_login_pressed()
     {
@@ -64,13 +59,13 @@ public partial class LoginMenu : Control
     }
     void _on_registration_pressed()
     {
-        hide_windows();
+        LoginWindow.Visible = false;
         RegistrationWindow.Visible = true;
     }
     void _on_back_pressed()
     {
-        hide_windows();
         LoginWindow.Visible = true;
+        RegistrationWindow.Visible = false;
     }
     void _on_register_pressed()
     {
