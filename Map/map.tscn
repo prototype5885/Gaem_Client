@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=19 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="Script" path="res://Scripts/LoginMenu.cs" id="1_femt1"]
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
@@ -6,6 +6,15 @@
 [ext_resource type="Script" path="res://Scripts/Database.cs" id="2_3m5ob"]
 [ext_resource type="Script" path="res://Scripts/ConnectMenu.cs" id="2_cr3gi"]
 [ext_resource type="Script" path="res://Scripts/PlayerManager.cs" id="2_mg52f"]
+[ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
+[ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
+[ext_resource type="Theme" uid="uid://b25nqr38ccaa0" path="res://Etc/HUD.tres" id="8_57x1o"]
+[ext_resource type="Script" path="res://Scripts/Player/Hud/Hud.cs" id="9_58umg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fha85"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ujs30"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gxyvs"]
 
@@ -34,29 +43,146 @@ script = ExtResource("1_yxkmt")
 [node name="Tick" type="Timer" parent="MultiplayerManager"]
 wait_time = 0.05
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_cv27n")
+[node name="Database" type="Node" parent="MultiplayerManager"]
+script = ExtResource("2_3m5ob")
 
-[node name="PlayerManager" type="Node3D" parent="."]
+[node name="PlayerManager" type="Node" parent="."]
 script = ExtResource("2_mg52f")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("PlaneMesh_ic4ne")
-
-[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_t5kq2")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.642534, 0.766258, 0, -0.766258, 0.642534, 0, 0, 0)
-shadow_enabled = true
-
-[node name="LoginCamera" type="Camera3D" parent="."]
-transform = Transform3D(0.652694, -0.213502, 0.726917, 0, 0.959472, 0.281806, -0.757622, -0.183933, 0.626241, 5.20114, 1.99064, 4.45588)
-
-[node name="ConnectMenu" type="Control" parent="LoginCamera"]
+[node name="HUD" type="Control" parent="."]
 layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("8_57x1o")
+script = ExtResource("9_58umg")
+
+[node name="Info" type="Label" parent="HUD"]
+layout_mode = 1
+offset_right = 771.0
+offset_bottom = 493.0
+text = "hrwhwh
+bgbhw"
+
+[node name="InfoMultiplayer" type="Label" parent="HUD"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -771.0
+offset_bottom = 493.0
+grow_horizontal = 0
+text = "hrwhwh
+bgbhw"
+horizontal_alignment = 2
+
+[node name="Info2" type="Label" parent="HUD"]
+layout_mode = 1
+offset_top = 816.0
+offset_right = 771.0
+offset_bottom = 1309.0
+text = "hrwhwh
+bgbhw"
+
+[node name="GUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_tmkbl")
+
+[node name="Chat" type="Panel" parent="GUI"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -754.0
+offset_top = -519.0
+offset_right = -354.0
+offset_bottom = -119.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fha85")
+script = ExtResource("6_0bml2")
+
+[node name="MessagesMargin" type="MarginContainer" parent="GUI/Chat"]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -400.0
+offset_right = 400.0
+offset_bottom = -38.0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Messages" type="VBoxContainer" parent="GUI/Chat/MessagesMargin"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 10
+mouse_filter = 2
+alignment = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="HideChatTimer" type="Timer" parent="GUI/Chat"]
+wait_time = 10.0
+one_shot = true
+
+[node name="InputContainer" type="PanelContainer" parent="GUI/Chat"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -38.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_ujs30")
+
+[node name="InputPanel" type="Panel" parent="GUI/Chat/InputContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="GUI/Chat/InputContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+
+[node name="InputChat" type="LineEdit" parent="GUI/Chat/InputContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+placeholder_text = "Press enter to chat"
+max_length = 64
+editable = false
+expand_to_text_length = true
+flat = true
+
+[node name="SpamTimer" type="Timer" parent="GUI/Chat/InputContainer/MarginContainer"]
+unique_name_in_owner = true
+wait_time = 0.25
+one_shot = true
+
+[node name="ConnectMenu" type="Control" parent="GUI"]
+visible = false
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -64,7 +190,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_cr3gi")
 
-[node name="Connect" type="Control" parent="LoginCamera/ConnectMenu"]
+[node name="Connect" type="Control" parent="GUI/ConnectMenu"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -79,7 +205,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_k5sxp")
 
-[node name="Panel" type="Panel" parent="LoginCamera/ConnectMenu/Connect"]
+[node name="Panel" type="Panel" parent="GUI/ConnectMenu/Connect"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -87,7 +213,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="IP" type="LineEdit" parent="LoginCamera/ConnectMenu/Connect/Panel"]
+[node name="IP" type="LineEdit" parent="GUI/ConnectMenu/Connect/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -103,7 +229,7 @@ grow_vertical = 2
 text = "localhost"
 placeholder_text = "IP Address"
 
-[node name="Port" type="LineEdit" parent="LoginCamera/ConnectMenu/Connect/Panel"]
+[node name="Port" type="LineEdit" parent="GUI/ConnectMenu/Connect/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -119,7 +245,7 @@ grow_vertical = 2
 text = "1942"
 placeholder_text = "Port"
 
-[node name="Connect" type="Button" parent="LoginCamera/ConnectMenu/Connect/Panel"]
+[node name="Connect" type="Button" parent="GUI/ConnectMenu/Connect/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -134,7 +260,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Connect"
 
-[node name="ToHost" type="Button" parent="LoginCamera/ConnectMenu/Connect/Panel"]
+[node name="ToHost" type="Button" parent="GUI/ConnectMenu/Connect/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -149,7 +275,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Host"
 
-[node name="Host" type="Control" parent="LoginCamera/ConnectMenu"]
+[node name="Host" type="Control" parent="GUI/ConnectMenu"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -164,7 +290,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_k5sxp")
 
-[node name="Panel" type="Panel" parent="LoginCamera/ConnectMenu/Host"]
+[node name="Panel" type="Panel" parent="GUI/ConnectMenu/Host"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -172,7 +298,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Port" type="LineEdit" parent="LoginCamera/ConnectMenu/Host/Panel"]
+[node name="Port" type="LineEdit" parent="GUI/ConnectMenu/Host/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -188,7 +314,7 @@ grow_vertical = 2
 text = "1942"
 placeholder_text = "Port"
 
-[node name="Host" type="Button" parent="LoginCamera/ConnectMenu/Host/Panel"]
+[node name="Host" type="Button" parent="GUI/ConnectMenu/Host/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -203,7 +329,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Host"
 
-[node name="Back" type="Button" parent="LoginCamera/ConnectMenu/Host/Panel"]
+[node name="Back" type="Button" parent="GUI/ConnectMenu/Host/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -218,8 +344,9 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Back"
 
-[node name="LoginMenu" type="Control" parent="LoginCamera"]
-layout_mode = 3
+[node name="LoginMenu" type="Control" parent="GUI"]
+visible = false
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -227,7 +354,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_femt1")
 
-[node name="Login" type="Control" parent="LoginCamera/LoginMenu"]
+[node name="Login" type="Control" parent="GUI/LoginMenu"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -242,7 +369,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_k5sxp")
 
-[node name="Panel" type="Panel" parent="LoginCamera/LoginMenu/Login"]
+[node name="Panel" type="Panel" parent="GUI/LoginMenu/Login"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -250,7 +377,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Username" type="LineEdit" parent="LoginCamera/LoginMenu/Login/Panel"]
+[node name="Username" type="LineEdit" parent="GUI/LoginMenu/Login/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -265,7 +392,7 @@ grow_horizontal = 2
 grow_vertical = 2
 placeholder_text = "Username"
 
-[node name="Password" type="LineEdit" parent="LoginCamera/LoginMenu/Login/Panel"]
+[node name="Password" type="LineEdit" parent="GUI/LoginMenu/Login/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -281,7 +408,7 @@ grow_vertical = 2
 placeholder_text = "Password"
 secret = true
 
-[node name="Login" type="Button" parent="LoginCamera/LoginMenu/Login/Panel"]
+[node name="Login" type="Button" parent="GUI/LoginMenu/Login/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -296,7 +423,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Login"
 
-[node name="Registration" type="Button" parent="LoginCamera/LoginMenu/Login/Panel"]
+[node name="Registration" type="Button" parent="GUI/LoginMenu/Login/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -311,7 +438,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Registration"
 
-[node name="Registration" type="Control" parent="LoginCamera/LoginMenu"]
+[node name="Registration" type="Control" parent="GUI/LoginMenu"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -325,7 +452,7 @@ offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="Panel" parent="LoginCamera/LoginMenu/Registration"]
+[node name="Panel" type="Panel" parent="GUI/LoginMenu/Registration"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -333,7 +460,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Username" type="LineEdit" parent="LoginCamera/LoginMenu/Registration/Panel"]
+[node name="Username" type="LineEdit" parent="GUI/LoginMenu/Registration/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -348,7 +475,7 @@ grow_horizontal = 2
 grow_vertical = 2
 placeholder_text = "Username"
 
-[node name="Password" type="LineEdit" parent="LoginCamera/LoginMenu/Registration/Panel"]
+[node name="Password" type="LineEdit" parent="GUI/LoginMenu/Registration/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -364,7 +491,7 @@ grow_vertical = 2
 placeholder_text = "Password"
 secret = true
 
-[node name="Password2" type="LineEdit" parent="LoginCamera/LoginMenu/Registration/Panel"]
+[node name="Password2" type="LineEdit" parent="GUI/LoginMenu/Registration/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -380,7 +507,7 @@ grow_vertical = 2
 placeholder_text = "Password again"
 secret = true
 
-[node name="PassNoMatch" type="Label" parent="LoginCamera/LoginMenu/Registration/Panel"]
+[node name="PassNoMatch" type="Label" parent="GUI/LoginMenu/Registration/Panel"]
 visible = false
 layout_mode = 0
 offset_left = 470.0
@@ -390,7 +517,7 @@ offset_bottom = 277.0
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 text = "Passwords don't match"
 
-[node name="Register" type="Button" parent="LoginCamera/LoginMenu/Registration/Panel"]
+[node name="Register" type="Button" parent="GUI/LoginMenu/Registration/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -405,7 +532,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Register"
 
-[node name="Back" type="Button" parent="LoginCamera/LoginMenu/Registration/Panel"]
+[node name="Back" type="Button" parent="GUI/LoginMenu/Registration/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -421,17 +548,36 @@ grow_vertical = 2
 text = "Back
 "
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_cv27n")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_ic4ne")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_t5kq2")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.642534, 0.766258, 0, -0.766258, 0.642534, 0, 0, 0)
+shadow_enabled = true
+
+[node name="LoginCamera" type="Camera3D" parent="."]
+transform = Transform3D(0.652694, -0.213502, 0.726917, 0, 0.959472, 0.281806, -0.757622, -0.183933, 0.626241, 5.20114, 1.99064, 4.45588)
+visible = false
+
 [node name="TimeLoop" type="Timer" parent="."]
 autostart = true
 
-[node name="Database" type="Node" parent="."]
-script = ExtResource("2_3m5ob")
-
-[connection signal="pressed" from="LoginCamera/ConnectMenu/Connect/Panel/Connect" to="LoginCamera/ConnectMenu" method="_on_connect_pressed"]
-[connection signal="pressed" from="LoginCamera/ConnectMenu/Connect/Panel/ToHost" to="LoginCamera/ConnectMenu" method="_on_to_host_pressed"]
-[connection signal="pressed" from="LoginCamera/ConnectMenu/Host/Panel/Host" to="LoginCamera/ConnectMenu" method="_on_host_pressed"]
-[connection signal="pressed" from="LoginCamera/ConnectMenu/Host/Panel/Back" to="LoginCamera/ConnectMenu" method="_on_back_pressed"]
-[connection signal="pressed" from="LoginCamera/LoginMenu/Login/Panel/Login" to="LoginCamera/LoginMenu" method="_on_login_pressed"]
-[connection signal="pressed" from="LoginCamera/LoginMenu/Login/Panel/Registration" to="LoginCamera/LoginMenu" method="_on_registration_pressed"]
-[connection signal="pressed" from="LoginCamera/LoginMenu/Registration/Panel/Register" to="LoginCamera/LoginMenu" method="_on_register_pressed"]
-[connection signal="pressed" from="LoginCamera/LoginMenu/Registration/Panel/Back" to="LoginCamera/LoginMenu" method="_on_back_pressed"]
+[connection signal="timeout" from="GUI/Chat/HideChatTimer" to="GUI/Chat" method="_on_hide_chat_timer_timeout"]
+[connection signal="gui_input" from="GUI/Chat/InputContainer/MarginContainer/InputChat" to="GUI/Chat" method="_on_input_chat_gui_input"]
+[connection signal="timeout" from="GUI/Chat/InputContainer/MarginContainer/SpamTimer" to="GUI/Chat" method="_on_spam_timer_timeout"]
+[connection signal="pressed" from="GUI/ConnectMenu/Connect/Panel/Connect" to="GUI/ConnectMenu" method="_on_connect_pressed"]
+[connection signal="pressed" from="GUI/ConnectMenu/Connect/Panel/ToHost" to="GUI/ConnectMenu" method="_on_to_host_pressed"]
+[connection signal="pressed" from="GUI/ConnectMenu/Host/Panel/Host" to="GUI/ConnectMenu" method="_on_host_pressed"]
+[connection signal="pressed" from="GUI/ConnectMenu/Host/Panel/Back" to="GUI/ConnectMenu" method="_on_back_pressed"]
+[connection signal="pressed" from="GUI/LoginMenu/Login/Panel/Login" to="GUI/LoginMenu" method="_on_login_pressed"]
+[connection signal="pressed" from="GUI/LoginMenu/Login/Panel/Registration" to="GUI/LoginMenu" method="_on_registration_pressed"]
+[connection signal="pressed" from="GUI/LoginMenu/Registration/Panel/Register" to="GUI/LoginMenu" method="_on_register_pressed"]
+[connection signal="pressed" from="GUI/LoginMenu/Registration/Panel/Back" to="GUI/LoginMenu" method="_on_back_pressed"]

@@ -20,6 +20,22 @@ public partial class MultiplayerManager : Node
         Multiplayer.ConnectionFailed += ConnectionFailed;
     }
 
+    public override void _Input(InputEvent @event)
+    {
+        if (@event is InputEventKey)
+        {
+            if (Input.IsActionJustPressed("host"))
+            {
+                host_server(1942);
+                SetProcessInput(false);
+            }
+            if (Input.IsActionJustPressed("join"))
+            {
+                connect_to_server("localhost", 1942);
+                SetProcessInput(false);
+            }
+        }
+    }
     private void ConnectionFailed()
     {
         GD.Print("connection failed");

@@ -1,10 +1,9 @@
 using Godot;
 
-
 public partial class Chat : Panel
 {
     PackedScene chatMessageScene;
-    bool canMessage = true;
+    bool SpamCooldownEnded = true;
     Node clientDataManager;
 
     LineEdit inputChat;
@@ -13,6 +12,8 @@ public partial class Chat : Panel
     Timer hideChatTimer;
     VBoxContainer messages;
     Timer spamTimer;
+
+    GUI GUI;
 
     public override void _Ready()
     {
@@ -24,26 +25,30 @@ public partial class Chat : Panel
         hideChatTimer = GetChild<Timer>(1);
         messages = messagesMargin.GetChild<VBoxContainer>(0);
         spamTimer = GetNode<Timer>("%SpamTimer");
+        GUI = GetParent<GUI>();
         // end
 
         //inputChat.Visible = false;
         //inputPanel.Visible = false;
-        //SetProcessUnhandledInput(false);
     }
     public override void _Input(InputEvent @event)
     {
         if (@event is InputEventKey)
         {
-            if (Input.IsActionJustPressed("ui_accept"))
+            if (Input.IsActionJustPressed("chat"))
             {
                 if (!inputChat.Editable)
                 {
                     start_typing();
                 }
-                else if (canMessage)
-                {
-                    prepare_message(inputChat.Text);
-                }
+                // else if (canMessage)
+                // {
+                //     prepare_message(inputChat.Text);
+                // }
+            }
+            if (Input.IsActionJustPressed("ui_accept") && SpamCooldownEnded)
+            {
+                prepare_message(inputChat.Text);
             }
             else if (Input.IsActionJustPressed("ui_cancel"))
             {
@@ -58,40 +63,42 @@ public partial class Chat : Panel
             clean_message();
         }
     }
-    void start_typing()
+    private void start_typing()
     {
+        GUI.input_enabled(false); // disable controls for player
         messagesMargin.Visible = true;
         inputPanel.Visible = true;
+
         inputChat.PlaceholderText = "";
         hideChatTimer.Stop();
 
         inputChat.Editable = true;
         inputChat.GrabFocus();
 
-        // disables other input while typing
-        // need stuff
-        SetProcessUnhandledInput(true);
-        //Input.MouseMode = Input.MouseModeEnum.Captured;
+        inputChat.Text = "wtf"; // resets the chat message so it wont include letter t
+
+        Input.MouseMode = Input.MouseModeEnum.Visible;
     }
     void prepare_message(string message)
     {
+
         if (message != "")
         {
             Rpc("send_message", message);
-            canMessage = false;
+            SpamCooldownEnded = false;
             spamTimer.Start();
         }
         clean_message();
     }
     void clean_message()
     {
+        GUI.input_enabled(true); // enable controls for player
         inputChat.PlaceholderText = "Press enter to Chat";
         hideChatTimer.Start();
         inputChat.Text = "";
 
         // enables input after message is sent
-        SetProcessUnhandledInput(false);
-        //Input.MouseMode = Input.MouseModeEnum.Visible;
+        Input.MouseMode = Input.MouseModeEnum.Captured;
 
         inputPanel.Visible = false;
         inputChat.Editable = false;
@@ -99,25 +106,25 @@ public partial class Chat : Panel
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     void send_message(string message)
     {
-        //HBoxContainer chatMessage = chatMessageScene.Instantiate<HBoxContainer>();
+        HBoxContainer chatMessage = chatMessageScene.Instantiate<HBoxContainer>();
 
-        //chatMessage.GetNode<Label>("Message").Text = message;
-        //chatMessage.GetNode<Label>("Name").Text = Multiplayer.GetRemoteSenderId().ToString();
+        chatMessage.GetNode<Label>("Message").Text = message;
+        chatMessage.GetNode<Label>("Name").Text = Multiplayer.GetRemoteSenderId().ToString();
 
 
-        //messages.AddChild(chatMessage, true);
+        messages.AddChild(chatMessage, true);
 
-        //if (messages.GetChildCount() > 10)
-        //{
-        //    messages.GetChild(0).QueueFree();
-        //}
+        if (messages.GetChildCount() > 10)
+        {
+           messages.GetChild(0).QueueFree();
+        }
 
-        //messagesMargin.Visible = true;
-        //hideChatTimer.Start();
+        messagesMargin.Visible = true;
+        hideChatTimer.Start();
     }
     void _on_spam_timer_timeout()
     {
-        canMessage = true;
+        SpamCooldownEnded = true;
     }
     void _on_input_chat_gui_input(InputEvent @event)
     {

@@ -5,7 +5,7 @@ public partial class Hud : Control
 {
     Label info;
     Label MultiplayerInfo;
-    Stats stats;
+    // Stats stats;
     MultiplayerManager MultiplayerManager;
 
     public override void _Ready()
@@ -13,7 +13,7 @@ public partial class Hud : Control
         // init
         info = GetNode<Label>("Info");
         MultiplayerInfo = GetNode<Label>("InfoMultiplayer");
-        stats = GetNode<Stats>("%Stats");
+        // stats = GetNode<Stats>("%Stats");
         Timer time = GetNode<Timer>("/root/Map/TimeLoop");
         MultiplayerManager = GetNode<MultiplayerManager>("/root/Map/MultiplayerManager");
         // end
@@ -22,11 +22,11 @@ public partial class Hud : Control
 
         MultiplayerManager.Connect("PlayerConnected", new Callable(this, nameof(connected)));
 
-        update_info();
+        // update_info();
     }
     public void update_info()
     {
-        info.Text = "Money: " + stats.money.ToString() + "\n" + "Wages: " + stats.wage.ToString();
+        // info.Text = "Money: " + stats.money.ToString() + "\n" + "Wages: " + stats.wage.ToString();
     }
     public void connected()
     {

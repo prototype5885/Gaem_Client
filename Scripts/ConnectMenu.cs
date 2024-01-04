@@ -33,9 +33,9 @@ public partial class ConnectMenu : Control
         LoginMenu = GetParent().GetChild<Control>(1);
         // end
 
-        Visible = true;
-        ConnectWindow.Visible = true;
-        HostWindow.Visible = false;
+        // Visible = true;
+        // ConnectWindow.Visible = true;
+        // HostWindow.Visible = false;
 
     }
     void _on_to_host_pressed()

@@ -4,6 +4,8 @@ using static Godot.TextServer;
 
 public partial class Movement : CharacterBody3D
 {
+    GUI GUI;
+
     Camera3D camera;
 
     // speed multipliers
@@ -36,11 +38,16 @@ public partial class Movement : CharacterBody3D
 
     bool falling = false;
 
+    bool canMove = true;
+
     public override void _Ready()
     {
         // init
+        GUI = GetNode<GUI>("/root/Map/GUI");
         camera = GetNode<Camera3D>("Head");
         // end
+
+        GUI.InputEnabled += InputEnabled;
 
         change_speed();
     }
@@ -68,6 +75,11 @@ public partial class Movement : CharacterBody3D
             }
         }
     }
+    void InputEnabled(bool input)
+    {
+        SetProcessInput(input);
+        canMove = input;
+    }
     public override void _PhysicsProcess(double delta)
     {
         movement((float)delta);
@@ -81,8 +93,17 @@ public partial class Movement : CharacterBody3D
         // gets input from WASD
         direction = Vector3.Zero;
         h_rot = GlobalTransform.Basis.GetEuler().Y;
-        f_input = Input.GetActionStrength("move_backwards") - Input.GetActionStrength("move_forwards");
-        h_input = Input.GetActionStrength("move_right") - Input.GetActionStrength("move_left");
+        
+        if (canMove)
+        {
+            f_input = Input.GetActionStrength("move_backwards") - Input.GetActionStrength("move_forwards");
+            h_input = Input.GetActionStrength("move_right") - Input.GetActionStrength("move_left");
+        }
+        else
+        {
+            f_input = 0;
+            h_input = 0;
+        }
 
         direction = new Vector3(h_input, 0, f_input).Rotated(Vector3.Up, h_rot).Normalized();
 

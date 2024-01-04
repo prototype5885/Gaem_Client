@@ -23,7 +23,7 @@ public partial class LoginMenu : Control
     public override void _Ready()
     {
         // init
-        database = GetNode<Database>("/root/Map/Database");
+        database = GetNode<Database>("/root/Map/MultiplayerManager/Database");
 
         LoginWindow = GetChild<Control>(0);
         RegistrationWindow = GetChild<Control>(1);
