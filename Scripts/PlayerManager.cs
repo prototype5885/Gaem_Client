@@ -14,9 +14,9 @@ public partial class PlayerManager : Node
     public void InstantiatePlayer(int id)
     {
         CharacterBody3D player = playerScene.Instantiate() as CharacterBody3D;
-        player.Name = GD.Randi().ToString();
-        //player.GlobalPosition = player.GlobalPosition with { Y = 5 };
-        //player.SetMultiplayerAuthority(id);
+        player.Name = id.ToString();
+        player.SetMultiplayerAuthority(id);
         AddChild(player);
+        player.GlobalPosition = player.GlobalPosition with { Y = 5 };
     }
 }

@@ -1,5 +1,4 @@
 using Godot;
-
 public partial class Chat : Panel
 {
     PackedScene chatMessageScene;
@@ -75,16 +74,17 @@ public partial class Chat : Panel
         inputChat.Editable = true;
         inputChat.GrabFocus();
 
-        inputChat.Text = "wtf"; // resets the chat message so it wont include letter t
+        //inputChat.Text = "wtf"; // resets the chat message so it wont include letter t
 
         Input.MouseMode = Input.MouseModeEnum.Visible;
     }
     void prepare_message(string message)
     {
-
         if (message != "")
         {
-            Rpc("send_message", message);
+            Rpc(nameof(SendMessage), message); // send to server
+            //SendMessage(message);
+
             SpamCooldownEnded = false;
             spamTimer.Start();
         }
@@ -103,20 +103,20 @@ public partial class Chat : Panel
         inputPanel.Visible = false;
         inputChat.Editable = false;
     }
+
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    void send_message(string message)
+    void SendMessage(string message)
     {
         HBoxContainer chatMessage = chatMessageScene.Instantiate<HBoxContainer>();
 
         chatMessage.GetNode<Label>("Message").Text = message;
         chatMessage.GetNode<Label>("Name").Text = Multiplayer.GetRemoteSenderId().ToString();
 
-
         messages.AddChild(chatMessage, true);
 
         if (messages.GetChildCount() > 10)
         {
-           messages.GetChild(0).QueueFree();
+            messages.GetChild(0).QueueFree();
         }
 
         messagesMargin.Visible = true;

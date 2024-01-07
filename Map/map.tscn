@@ -1,11 +1,13 @@
-[gd_scene load_steps=19 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=21 format=3 uid="uid://kig6msmcak75"]
 
+[ext_resource type="Script" path="res://Scripts/Multiplayer/MultiplayerManager.cs" id="1_5dkaa"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/Host.cs" id="1_bw7qx"]
 [ext_resource type="Script" path="res://Scripts/LoginMenu.cs" id="1_femt1"]
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
-[ext_resource type="Script" path="res://Scripts/MultiplayerManager.cs" id="1_yxkmt"]
 [ext_resource type="Script" path="res://Scripts/Database.cs" id="2_3m5ob"]
 [ext_resource type="Script" path="res://Scripts/ConnectMenu.cs" id="2_cr3gi"]
 [ext_resource type="Script" path="res://Scripts/PlayerManager.cs" id="2_mg52f"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/Client.cs" id="3_0dq3t"]
 [ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
 [ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
 [ext_resource type="Theme" uid="uid://b25nqr38ccaa0" path="res://Etc/HUD.tres" id="8_57x1o"]
@@ -38,18 +40,25 @@ data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0
 [node name="Map" type="Node3D"]
 
 [node name="MultiplayerManager" type="Node" parent="."]
-script = ExtResource("1_yxkmt")
+script = ExtResource("1_5dkaa")
 
-[node name="Tick" type="Timer" parent="MultiplayerManager"]
+[node name="Host" type="Node" parent="MultiplayerManager"]
+script = ExtResource("1_bw7qx")
+
+[node name="Tick" type="Timer" parent="MultiplayerManager/Host"]
 wait_time = 0.05
 
-[node name="Database" type="Node" parent="MultiplayerManager"]
+[node name="Database" type="Node" parent="MultiplayerManager/Host"]
 script = ExtResource("2_3m5ob")
+
+[node name="Client" type="Node" parent="MultiplayerManager"]
+script = ExtResource("3_0dq3t")
 
 [node name="PlayerManager" type="Node" parent="."]
 script = ExtResource("2_mg52f")
 
 [node name="HUD" type="Control" parent="."]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

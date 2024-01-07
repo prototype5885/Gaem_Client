@@ -3,7 +3,8 @@ using System;
 
 public partial class ConnectMenu : Control
 {
-    MultiplayerManager MultiplayerManager;
+    Host Host;
+    Client Client;
 
     Control ConnectWindow;
     Control HostWindow;
@@ -18,7 +19,8 @@ public partial class ConnectMenu : Control
     public override void _Ready()
     {
         // init
-        MultiplayerManager = GetNode<MultiplayerManager>("/root/Map/MultiplayerManager");
+        Host = GetNode<Host>("/root/Map/MultiplayerManager/Host");
+        Client = GetNode<Client>("/root/Map/MultiplayerManager/Client");
 
         ConnectWindow = GetChild<Control>(0);
         HostWindow = GetChild<Control>(1);
@@ -59,7 +61,7 @@ public partial class ConnectMenu : Control
 
         string ip = InputIP.Text;
 
-        MultiplayerManager.connect_to_server(ip, port);
+        //Client.ConnectToServer(ip, port);
 
         Visible = false;
         //LoginMenu.Visible = true;
@@ -73,7 +75,7 @@ public partial class ConnectMenu : Control
             return;
         }
 
-        MultiplayerManager.host_server(port);
+        //Host.HostServer(port);
 
         Visible = false;
         //LoginMenu.Visible = true;

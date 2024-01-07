@@ -5,7 +5,6 @@ using static Godot.TextServer;
 public partial class Movement : CharacterBody3D
 {
     GUI GUI;
-
     Camera3D camera;
 
     // speed multipliers
