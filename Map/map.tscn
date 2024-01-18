@@ -1,17 +1,18 @@
-[gd_scene load_steps=21 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=23 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="Script" path="res://Scripts/Multiplayer/MultiplayerManager.cs" id="1_5dkaa"]
-[ext_resource type="Script" path="res://Scripts/Multiplayer/Host.cs" id="1_bw7qx"]
 [ext_resource type="Script" path="res://Scripts/LoginMenu.cs" id="1_femt1"]
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
 [ext_resource type="Script" path="res://Scripts/Database.cs" id="2_3m5ob"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/Host.cs" id="2_5wl6g"]
 [ext_resource type="Script" path="res://Scripts/ConnectMenu.cs" id="2_cr3gi"]
 [ext_resource type="Script" path="res://Scripts/PlayerManager.cs" id="2_mg52f"]
-[ext_resource type="Script" path="res://Scripts/Multiplayer/Client.cs" id="3_0dq3t"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/ClientTCP.cs" id="4_qs75a"]
 [ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
 [ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
 [ext_resource type="Theme" uid="uid://b25nqr38ccaa0" path="res://Etc/HUD.tres" id="8_57x1o"]
 [ext_resource type="Script" path="res://Scripts/Player/Hud/Hud.cs" id="9_58umg"]
+[ext_resource type="PackedScene" uid="uid://wec1vy3t4ead" path="res://Components/Player.tscn" id="13_kp2gw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fha85"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -37,13 +38,15 @@ size = Vector2(10, 10)
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_t5kq2"]
 data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0, -5)
 
+[sub_resource type="BoxMesh" id="BoxMesh_wkol4"]
+
 [node name="Map" type="Node3D"]
 
 [node name="MultiplayerManager" type="Node" parent="."]
 script = ExtResource("1_5dkaa")
 
 [node name="Host" type="Node" parent="MultiplayerManager"]
-script = ExtResource("1_bw7qx")
+script = ExtResource("2_5wl6g")
 
 [node name="Tick" type="Timer" parent="MultiplayerManager/Host"]
 wait_time = 0.05
@@ -51,8 +54,16 @@ wait_time = 0.05
 [node name="Database" type="Node" parent="MultiplayerManager/Host"]
 script = ExtResource("2_3m5ob")
 
+[node name="Label" type="Label" parent="MultiplayerManager/Host"]
+offset_left = 610.0
+offset_top = 356.0
+offset_right = 1510.0
+offset_bottom = 663.0
+theme_override_font_sizes/font_size = 64
+text = "wtf"
+
 [node name="Client" type="Node" parent="MultiplayerManager"]
-script = ExtResource("3_0dq3t")
+script = ExtResource("4_qs75a")
 
 [node name="PlayerManager" type="Node" parent="."]
 script = ExtResource("2_mg52f")
@@ -578,6 +589,13 @@ visible = false
 
 [node name="TimeLoop" type="Timer" parent="."]
 autostart = true
+
+[node name="Player" parent="." instance=ExtResource("13_kp2gw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.885289, -1.19209e-07, 1.6737)
+
+[node name="OnlineObject" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.938625, -1.85565)
+mesh = SubResource("BoxMesh_wkol4")
 
 [connection signal="timeout" from="GUI/Chat/HideChatTimer" to="GUI/Chat" method="_on_hide_chat_timer_timeout"]
 [connection signal="gui_input" from="GUI/Chat/InputContainer/MarginContainer/InputChat" to="GUI/Chat" method="_on_input_chat_gui_input"]

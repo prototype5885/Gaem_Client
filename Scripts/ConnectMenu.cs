@@ -3,8 +3,8 @@ using System;
 
 public partial class ConnectMenu : Control
 {
-    Host Host;
-    Client Client;
+    //Host Host;
+    //Client Client;
 
     Control ConnectWindow;
     Control HostWindow;
@@ -19,8 +19,8 @@ public partial class ConnectMenu : Control
     public override void _Ready()
     {
         // init
-        Host = GetNode<Host>("/root/Map/MultiplayerManager/Host");
-        Client = GetNode<Client>("/root/Map/MultiplayerManager/Client");
+        //Host = GetNode<Host>("/root/Map/MultiplayerManager/Host");
+        //Client = GetNode<Client>("/root/Map/MultiplayerManager/Client");
 
         ConnectWindow = GetChild<Control>(0);
         HostWindow = GetChild<Control>(1);
