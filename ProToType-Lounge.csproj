@@ -7,13 +7,4 @@
     <RootNamespace>ProToTypeLounge</RootNamespace>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Scripts\Database.cs">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Compile>
-  </ItemGroup>
 </Project>

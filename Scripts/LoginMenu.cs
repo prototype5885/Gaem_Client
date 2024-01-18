@@ -1,9 +1,12 @@
 using Godot;
-using ProToTypeLounge.Password;
+using System;
+using System.Text;
+using System.Security.Cryptography;
+
 
 public partial class LoginMenu : Control
 {
-    Database database;
+    //Database database;
 
     Control LoginWindow;
     Control RegistrationWindow;
@@ -23,7 +26,7 @@ public partial class LoginMenu : Control
     public override void _Ready()
     {
         // init
-        database = GetNode<Database>("/root/Map/MultiplayerManager/Host/Database");
+        //database = GetNode<Database>("/root/Map/MultiplayerManager/Host/Database");
 
         LoginWindow = GetChild<Control>(0);
         RegistrationWindow = GetChild<Control>(1);
@@ -48,11 +51,20 @@ public partial class LoginMenu : Control
     void _on_login_pressed()
     {
         string username = LoginInputUserName.Text;
-        string hashedPassword = Password.HashPassword(LoginInputPassword.Text);
+
+
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            // Compute the hash of the password
+            byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(LoginInputPassword.Text));
+
+            // Convert the byte array to a hexadecimal string
+            string hashedpassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+        }
 
         //string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
-        database.LoginUser(username, hashedPassword);
+        //database.LoginUser(username, hashedPassword);
 
         // compare password
         //bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify("XD", hashedPassword);
@@ -83,9 +95,9 @@ public partial class LoginMenu : Control
         // encrypt password
         //string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password1);
 
-        string hashedPassword = Password.HashPassword(password1);
+        //string hashedPassword = Password.HashPassword(password1);
 
-        database.NewUser(username, hashedPassword);
+        //database.NewUser(username, hashedPassword);
         //database.QueryAndDisplayData();
 
         //if (!Password.ValidateCredentials(password1, hashedPassword))

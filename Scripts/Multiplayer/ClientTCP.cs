@@ -11,6 +11,8 @@ public partial class ClientTCP : Node
     TcpClient tcpClient;
     MeshInstance3D OnlineObject;
 
+    //float newPosition;
+
     public override void _Ready()
     {
         //SetProcess(false);
@@ -25,7 +27,6 @@ public partial class ClientTCP : Node
             {
                 //ConnectToHost("127.0.0.1", 1942);
                 Task.Run(() => ConnectToHost("127.0.0.1", 1942));
-                SetProcess(true);
             }
         }
     }
@@ -85,13 +86,12 @@ public partial class ClientTCP : Node
                         Console.WriteLine("Invalid input string");
                     }
 
-
-     
-                    GD.Print(floatValue);
+                    //newPosition = floatValue;
 
 
-                    //GD.Print("Received message: " + receivedMessage);
-                    CallDeferred("setObjectPosition", floatValue);
+                    GD.Print("Received message: " + receivedMessage);
+
+                    CallDeferred(MethodName.setObjectPosition, floatValue);
 
                 }
             }
@@ -110,12 +110,17 @@ public partial class ClientTCP : Node
         }
 
     }
-
+ 
     void setObjectPosition(float position)
     {
-        OnlineObject.Position = OnlineObject.Position with { X = position/100 };
+        OnlineObject.Position = OnlineObject.Position with { X = position / 20 };
     }
-
+    //public override void _Process(double delta)
+    //{
+    //    Vector3 localPos = OnlineObject.Position;
+    //    localPos.X = Mathf.Lerp(localPos.X, newPosition / 10, (float)delta);
+    //    OnlineObject.Position = localPos;
+    //}
     //public override void _Process(double delta)
     //{
     //    // Check for incoming data

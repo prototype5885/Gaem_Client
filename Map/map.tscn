@@ -1,10 +1,7 @@
-[gd_scene load_steps=23 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=20 format=3 uid="uid://kig6msmcak75"]
 
-[ext_resource type="Script" path="res://Scripts/Multiplayer/MultiplayerManager.cs" id="1_5dkaa"]
 [ext_resource type="Script" path="res://Scripts/LoginMenu.cs" id="1_femt1"]
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
-[ext_resource type="Script" path="res://Scripts/Database.cs" id="2_3m5ob"]
-[ext_resource type="Script" path="res://Scripts/Multiplayer/Host.cs" id="2_5wl6g"]
 [ext_resource type="Script" path="res://Scripts/ConnectMenu.cs" id="2_cr3gi"]
 [ext_resource type="Script" path="res://Scripts/PlayerManager.cs" id="2_mg52f"]
 [ext_resource type="Script" path="res://Scripts/Multiplayer/ClientTCP.cs" id="4_qs75a"]
@@ -43,27 +40,17 @@ data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0
 [node name="Map" type="Node3D"]
 
 [node name="MultiplayerManager" type="Node" parent="."]
-script = ExtResource("1_5dkaa")
 
-[node name="Host" type="Node" parent="MultiplayerManager"]
-script = ExtResource("2_5wl6g")
+[node name="Client" type="Node" parent="MultiplayerManager"]
+script = ExtResource("4_qs75a")
 
-[node name="Tick" type="Timer" parent="MultiplayerManager/Host"]
-wait_time = 0.05
-
-[node name="Database" type="Node" parent="MultiplayerManager/Host"]
-script = ExtResource("2_3m5ob")
-
-[node name="Label" type="Label" parent="MultiplayerManager/Host"]
+[node name="Label" type="Label" parent="MultiplayerManager/Client"]
 offset_left = 610.0
 offset_top = 356.0
 offset_right = 1510.0
 offset_bottom = 663.0
 theme_override_font_sizes/font_size = 64
 text = "wtf"
-
-[node name="Client" type="Node" parent="MultiplayerManager"]
-script = ExtResource("4_qs75a")
 
 [node name="PlayerManager" type="Node" parent="."]
 script = ExtResource("2_mg52f")
