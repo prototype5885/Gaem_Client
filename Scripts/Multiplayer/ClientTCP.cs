@@ -11,7 +11,7 @@ public partial class ClientTCP : Node
     TcpClient tcpClient;
     MeshInstance3D OnlineObject;
 
-    //float newPosition;
+    //float[] ServerPositions = new float[16];
 
     public override void _Ready()
     {
@@ -86,12 +86,16 @@ public partial class ClientTCP : Node
                         Console.WriteLine("Invalid input string");
                     }
 
-                    //newPosition = floatValue;
+
 
 
                     GD.Print("Received message: " + receivedMessage);
 
                     CallDeferred(MethodName.setObjectPosition, floatValue);
+
+                    //ServerPositions[0] = floatValue;
+
+
 
                 }
             }
@@ -110,15 +114,15 @@ public partial class ClientTCP : Node
         }
 
     }
- 
-    void setObjectPosition(float position)
+
+    void setObjectPosition(float newPosition)
     {
-        OnlineObject.Position = OnlineObject.Position with { X = position / 20 };
+        OnlineObject.Position = OnlineObject.Position with { X = newPosition / 20 };
     }
     //public override void _Process(double delta)
     //{
     //    Vector3 localPos = OnlineObject.Position;
-    //    localPos.X = Mathf.Lerp(localPos.X, newPosition / 10, (float)delta);
+    //    localPos.X = Mathf.Lerp(localPos.X, ServerPositions[0] / 10, (float)delta);
     //    OnlineObject.Position = localPos;
     //}
     //public override void _Process(double delta)
