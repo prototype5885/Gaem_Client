@@ -14,6 +14,8 @@ public partial class Chat : Panel
 
     GUI GUI;
 
+    ClientTCP clientTCP;
+
     public override void _Ready()
     {
         // init
@@ -25,6 +27,7 @@ public partial class Chat : Panel
         messages = messagesMargin.GetChild<VBoxContainer>(0);
         spamTimer = GetNode<Timer>("%SpamTimer");
         GUI = GetParent<GUI>();
+        clientTCP = GetNode<ClientTCP>("/root/Map/MultiplayerManager/Client");
         // end
 
         //inputChat.Visible = false;
@@ -45,7 +48,7 @@ public partial class Chat : Panel
                 //     prepare_message(inputChat.Text);
                 // }
             }
-            if (Input.IsActionJustPressed("ui_accept") && SpamCooldownEnded)
+            if (Input.IsActionJustPressed("enter") && SpamCooldownEnded)
             {
                 prepare_message(inputChat.Text);
             }
@@ -82,9 +85,9 @@ public partial class Chat : Panel
     {
         if (message != "")
         {
-            Rpc(nameof(SendMessage), message); // send to server
+            //Rpc(nameof(SendMessage), message); // send to server
             //SendMessage(message);
-
+            clientTCP.messageToSend = message;
             SpamCooldownEnded = false;
             spamTimer.Start();
         }
@@ -104,24 +107,24 @@ public partial class Chat : Panel
         inputChat.Editable = false;
     }
 
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    void SendMessage(string message)
-    {
-        HBoxContainer chatMessage = chatMessageScene.Instantiate<HBoxContainer>();
+    //[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    //void SendMessage(string message)
+    //{
+    //    HBoxContainer chatMessage = chatMessageScene.Instantiate<HBoxContainer>();
 
-        chatMessage.GetNode<Label>("Message").Text = message;
-        chatMessage.GetNode<Label>("Name").Text = Multiplayer.GetRemoteSenderId().ToString();
+    //    chatMessage.GetNode<Label>("Message").Text = message;
+    //    chatMessage.GetNode<Label>("Name").Text = Multiplayer.GetRemoteSenderId().ToString();
 
-        messages.AddChild(chatMessage, true);
+    //    messages.AddChild(chatMessage, true);
 
-        if (messages.GetChildCount() > 10)
-        {
-            messages.GetChild(0).QueueFree();
-        }
+    //    if (messages.GetChildCount() > 10)
+    //    {
+    //        messages.GetChild(0).QueueFree();
+    //    }
 
-        messagesMargin.Visible = true;
-        hideChatTimer.Start();
-    }
+    //    messagesMargin.Visible = true;
+    //    hideChatTimer.Start();
+    //}
     void _on_spam_timer_timeout()
     {
         SpamCooldownEnded = true;

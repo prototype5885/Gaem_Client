@@ -1,22 +1,25 @@
 using Godot;
 using System;
 using System.Collections;
+using System.IO;
 using System.Net.Sockets;
 using System.Runtime.Intrinsics.Arm;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 public partial class ClientTCP : Node
 {
-    TcpClient tcpClient;
     MeshInstance3D OnlineObject;
 
     //float[] ServerPositions = new float[16];
+    public string messageToSend = "";
 
     public override void _Ready()
     {
-        //SetProcess(false);
+        // init
         OnlineObject = GetNode<MeshInstance3D>("/root/Map/OnlineObject");
+        // end
     }
 
     public override void _Input(InputEvent @event)
@@ -25,109 +28,69 @@ public partial class ClientTCP : Node
         {
             if (Input.IsActionJustPressed("join"))
             {
-                //ConnectToHost("127.0.0.1", 1942);
-                Task.Run(() => ConnectToHost("127.0.0.1", 1942));
+                Connect();
+
             }
         }
     }
-    async Task ConnectToHost(string ipAddress, int port)
+    void Connect()
     {
-        //string serverIpAddress = "127.0.0.1";
-        //int serverPort = 1942;
-
-        //tcpClient = new TcpClient();
-
-        //tcpClient.Connect(serverIpAddress, serverPort);
-
-        //Console.WriteLine("Connected to the server");
-
-        // Replace "127.0.0.1" and 12345 with your server's IP address and port number
-
-        tcpClient = new TcpClient();
-
-        try
+        TcpClient client = new TcpClient("127.0.0.1", 1942);
+        Task.Run(() => ReceivingDataFromServer(client));
+        Task.Run(() => SendingDataToServer(client));
+        SetProcessInput(false);
+    }
+    async Task ReceivingDataFromServer(TcpClient client)
+    {
+        NetworkStream receivingStream = client.GetStream();
+        while (true)
         {
-            // Connect to the server
-            tcpClient.Connect(ipAddress, port);
-
-            GD.Print("Connected to the server");
-
-            // Get the network stream for reading data
-            NetworkStream networkStream = tcpClient.GetStream();
-
-            // Receive messages continuously
-            while (true)
+            try
             {
+                byte[] receivedBytes = new byte[1024];
+                int bytesRead;
 
-                byte[] buffer = new byte[256];
-                int bytesRead = networkStream.Read(buffer, 0, buffer.Length);
+                bytesRead = await receivingStream.ReadAsync(receivedBytes, 0, receivedBytes.Length);
 
-                //byte[] trimmedBuffer = new byte[bytesRead];
-                //for (int i = 0; i < bytesRead; i++)
-                //{
-                //    trimmedBuffer[i] = buffer[i];
-                //}
-
-                //GD.Print(trimmedBuffer[0].ToString());
-
-                if (bytesRead > 0)
-                {
-                    string receivedMessage = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-
-                    float floatValue;
-                    if (float.TryParse(receivedMessage, out floatValue))
-                    {
-                        // Conversion successful, use the converted float value
-                        Console.WriteLine("Converted float value: " + floatValue);
-                    }
-                    else
-                    {
-                        // Conversion failed, handle the error
-                        Console.WriteLine("Invalid input string");
-                    }
+                string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
 
 
+                GD.Print($"Received from server: {receivedData}");
 
-
-                    GD.Print("Received message: " + receivedMessage);
-
-                    CallDeferred(MethodName.setObjectPosition, floatValue);
-
-                    //ServerPositions[0] = floatValue;
-
-
-
-                }
+                receivingStream.Flush();
+            }
+            catch (IOException)
+            {
+                // Server disconnected
+                break;
             }
         }
-        catch (Exception ex)
-        {
-            GD.Print("Error: " + ex.Message);
-        }
-        finally
-        {
-            // Close the TCP client when done
-            if (tcpClient != null && tcpClient.Connected)
-            {
-                tcpClient.Close();
-            }
-        }
-
     }
 
+    async Task SendingDataToServer(TcpClient client)
+    {
+        NetworkStream sendingStream = client.GetStream();
+        while (true)
+        {
+            try
+            {
+                StreamReader reader = new StreamReader(sendingStream);
+
+                byte[] messageByte = Encoding.ASCII.GetBytes(messageToSend);
+                await sendingStream.WriteAsync(messageByte, 0, messageByte.Length);
+
+                sendingStream.Flush();
+                messageToSend = "";
+            }
+            catch (Exception ex)
+            {
+                GD.Print(ex);
+            }
+            Thread.Sleep(50);
+        }
+    }
     void setObjectPosition(float newPosition)
     {
         OnlineObject.Position = OnlineObject.Position with { X = newPosition / 20 };
     }
-    //public override void _Process(double delta)
-    //{
-    //    Vector3 localPos = OnlineObject.Position;
-    //    localPos.X = Mathf.Lerp(localPos.X, ServerPositions[0] / 10, (float)delta);
-    //    OnlineObject.Position = localPos;
-    //}
-    //public override void _Process(double delta)
-    //{
-    //    // Check for incoming data
-    //    tcpClient.Poll();
-    //}
 }
