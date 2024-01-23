@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Godot;
 
-public class ProToMath
+public class ProToType
 {
     // Linear interpolation function
     public static Vector3 ProToLerp(Vector3 start, Vector3 end, float t)

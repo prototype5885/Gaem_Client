@@ -2,22 +2,50 @@ using Godot;
 
 public partial class GUI : Control
 {
-    [Signal] public delegate void InputEnabledEventHandler(bool input);
-    // Movement playerMovement;
-    // Head playerHead;
+    [Signal] public delegate void PlayerControlsSignalEventHandler(bool input);
 
-    // public override void _Ready()
-    // {
-    //     Node playerManager = GetNode<Node>("/root/Map/PlayerManager");
+    public MultiplayerClient mpClient;
 
-    //     playerMovement = playerManager.GetChild<Movement>(0);
-    //     playerHead = playerMovement.GetChild<Head>(0);
-    //     GD.Print(playerMovement);
-    //     GD.Print(playerHead);
-    // }
+    Control Windows;
 
-    public void input_enabled(bool input)
+    public Control ConnectWindow;
+    public Control LoginWindow;
+    public Control RegistrationWindow;
+
+
+    public override void _Ready()
     {
-        EmitSignal(SignalName.InputEnabled, input);
+        // init
+        mpClient = GetNode<MultiplayerClient>("/root/Map/MultiplayerManager/Client");
+
+        Windows = GetChild<Control>(1);
+
+        ConnectWindow = Windows.GetChild<Control>(0);
+        LoginWindow = Windows.GetChild<Control>(1);
+        RegistrationWindow = Windows.GetChild<Control>(2);
+        // end
+
+        Windows.Visible = true;
+
+        foreach (Control window in Windows.GetChildren())
+        {
+            window.Visible = false;
+        }
+
+        ConnectWindow.Visible = true;
+
+        PlayerControlsEnabled(false);
+    }
+    public void PlayerControlsEnabled(bool input)
+    {
+        if (input)
+        {
+            Input.MouseMode = Input.MouseModeEnum.Captured;
+        }
+        else
+        {
+            Input.MouseMode = Input.MouseModeEnum.Visible;
+        }
+        EmitSignal(SignalName.PlayerControlsSignal, input);
     }
 }

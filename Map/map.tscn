@@ -1,14 +1,14 @@
 [gd_scene load_steps=20 format=3 uid="uid://kig6msmcak75"]
 
-[ext_resource type="Script" path="res://Scripts/LoginMenu.cs" id="1_femt1"]
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
-[ext_resource type="Script" path="res://Scripts/ConnectMenu.cs" id="2_cr3gi"]
 [ext_resource type="Script" path="res://Scripts/PlayerManager.cs" id="2_mg52f"]
-[ext_resource type="Script" path="res://Scripts/Multiplayer/ClientTCP.cs" id="4_qs75a"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/MultiplayerClient.cs" id="4_qs75a"]
 [ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
 [ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
 [ext_resource type="Theme" uid="uid://b25nqr38ccaa0" path="res://Etc/HUD.tres" id="8_57x1o"]
 [ext_resource type="Script" path="res://Scripts/Player/Hud/Hud.cs" id="9_58umg"]
+[ext_resource type="Script" path="res://Scripts/Windows/ConnectWindow.cs" id="9_j43vl"]
+[ext_resource type="Script" path="res://Scripts/Windows/LoginWindow.cs" id="10_jojqg"]
 [ext_resource type="PackedScene" uid="uid://wec1vy3t4ead" path="res://Components/Player.tscn" id="13_kp2gw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fha85"]
@@ -44,16 +44,22 @@ data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0
 [node name="Client" type="Node" parent="MultiplayerManager"]
 script = ExtResource("4_qs75a")
 
-[node name="Label" type="Label" parent="MultiplayerManager/Client"]
-offset_left = 610.0
-offset_top = 356.0
-offset_right = 1510.0
-offset_bottom = 663.0
+[node name="StatusLabel" type="Label" parent="MultiplayerManager/Client"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -900.0
+offset_bottom = 307.0
+grow_horizontal = 0
 theme_override_font_sizes/font_size = 64
-text = "wtf"
+text = "Connection Status"
+horizontal_alignment = 2
 
 [node name="PlayerManager" type="Node" parent="."]
 script = ExtResource("2_mg52f")
+
+[node name="Player" parent="PlayerManager" instance=ExtResource("13_kp2gw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.885289, -1.19209e-07, 1.6737)
 
 [node name="HUD" type="Control" parent="."]
 visible = false
@@ -103,6 +109,7 @@ grow_vertical = 2
 script = ExtResource("6_tmkbl")
 
 [node name="Chat" type="Panel" parent="GUI"]
+visible = false
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -187,17 +194,16 @@ unique_name_in_owner = true
 wait_time = 0.25
 one_shot = true
 
-[node name="ConnectMenu" type="Control" parent="GUI"]
-visible = false
+[node name="Windows" type="Control" parent="GUI"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("2_cr3gi")
 
-[node name="Connect" type="Control" parent="GUI/ConnectMenu"]
+[node name="ConnectWindow" type="Control" parent="GUI/Windows"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -211,8 +217,9 @@ offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_k5sxp")
+script = ExtResource("9_j43vl")
 
-[node name="Panel" type="Panel" parent="GUI/ConnectMenu/Connect"]
+[node name="Panel" type="Panel" parent="GUI/Windows/ConnectWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -220,7 +227,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="IP" type="LineEdit" parent="GUI/ConnectMenu/Connect/Panel"]
+[node name="IP" type="LineEdit" parent="GUI/Windows/ConnectWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -236,7 +243,7 @@ grow_vertical = 2
 text = "localhost"
 placeholder_text = "IP Address"
 
-[node name="Port" type="LineEdit" parent="GUI/ConnectMenu/Connect/Panel"]
+[node name="Port" type="LineEdit" parent="GUI/Windows/ConnectWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -252,7 +259,7 @@ grow_vertical = 2
 text = "1942"
 placeholder_text = "Port"
 
-[node name="Connect" type="Button" parent="GUI/ConnectMenu/Connect/Panel"]
+[node name="Connect" type="Button" parent="GUI/Windows/ConnectWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -267,7 +274,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Connect"
 
-[node name="ToHost" type="Button" parent="GUI/ConnectMenu/Connect/Panel"]
+[node name="ToHost" type="Button" parent="GUI/Windows/ConnectWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -282,7 +289,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Host"
 
-[node name="Host" type="Control" parent="GUI/ConnectMenu"]
+[node name="LoginWindow" type="Control" parent="GUI/Windows"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -296,8 +303,9 @@ offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_k5sxp")
+script = ExtResource("10_jojqg")
 
-[node name="Panel" type="Panel" parent="GUI/ConnectMenu/Host"]
+[node name="Panel" type="Panel" parent="GUI/Windows/LoginWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -305,86 +313,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Port" type="LineEdit" parent="GUI/ConnectMenu/Host/Panel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 110.0
-offset_top = -95.0
-offset_right = 242.0
-offset_bottom = -42.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "1942"
-placeholder_text = "Port"
-
-[node name="Host" type="Button" parent="GUI/ConnectMenu/Host/Panel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -67.0
-offset_top = 10.0
-offset_right = 67.0
-offset_bottom = 64.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Host"
-
-[node name="Back" type="Button" parent="GUI/ConnectMenu/Host/Panel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 212.0
-offset_top = 113.0
-offset_right = 346.0
-offset_bottom = 167.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Back"
-
-[node name="LoginMenu" type="Control" parent="GUI"]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("1_femt1")
-
-[node name="Login" type="Control" parent="GUI/LoginMenu"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -360.0
-offset_top = -180.0
-offset_right = 360.0
-offset_bottom = 180.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("1_k5sxp")
-
-[node name="Panel" type="Panel" parent="GUI/LoginMenu/Login"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Username" type="LineEdit" parent="GUI/LoginMenu/Login/Panel"]
+[node name="Username" type="LineEdit" parent="GUI/Windows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -399,7 +328,7 @@ grow_horizontal = 2
 grow_vertical = 2
 placeholder_text = "Username"
 
-[node name="Password" type="LineEdit" parent="GUI/LoginMenu/Login/Panel"]
+[node name="Password" type="LineEdit" parent="GUI/Windows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -415,7 +344,7 @@ grow_vertical = 2
 placeholder_text = "Password"
 secret = true
 
-[node name="Login" type="Button" parent="GUI/LoginMenu/Login/Panel"]
+[node name="Login" type="Button" parent="GUI/Windows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -430,7 +359,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Login"
 
-[node name="Registration" type="Button" parent="GUI/LoginMenu/Login/Panel"]
+[node name="Registration" type="Button" parent="GUI/Windows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -445,7 +374,8 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Registration"
 
-[node name="Registration" type="Control" parent="GUI/LoginMenu"]
+[node name="RegistrationWindow" type="Control" parent="GUI/Windows"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -459,7 +389,7 @@ offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="Panel" parent="GUI/LoginMenu/Registration"]
+[node name="Panel" type="Panel" parent="GUI/Windows/RegistrationWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -467,7 +397,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Username" type="LineEdit" parent="GUI/LoginMenu/Registration/Panel"]
+[node name="Username" type="LineEdit" parent="GUI/Windows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -482,7 +412,7 @@ grow_horizontal = 2
 grow_vertical = 2
 placeholder_text = "Username"
 
-[node name="Password" type="LineEdit" parent="GUI/LoginMenu/Registration/Panel"]
+[node name="Password" type="LineEdit" parent="GUI/Windows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -498,7 +428,7 @@ grow_vertical = 2
 placeholder_text = "Password"
 secret = true
 
-[node name="Password2" type="LineEdit" parent="GUI/LoginMenu/Registration/Panel"]
+[node name="Password2" type="LineEdit" parent="GUI/Windows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -514,7 +444,7 @@ grow_vertical = 2
 placeholder_text = "Password again"
 secret = true
 
-[node name="PassNoMatch" type="Label" parent="GUI/LoginMenu/Registration/Panel"]
+[node name="PassNoMatch" type="Label" parent="GUI/Windows/RegistrationWindow/Panel"]
 visible = false
 layout_mode = 0
 offset_left = 470.0
@@ -524,7 +454,7 @@ offset_bottom = 277.0
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 text = "Passwords don't match"
 
-[node name="Register" type="Button" parent="GUI/LoginMenu/Registration/Panel"]
+[node name="Register" type="Button" parent="GUI/Windows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -539,7 +469,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Register"
 
-[node name="Back" type="Button" parent="GUI/LoginMenu/Registration/Panel"]
+[node name="Back" type="Button" parent="GUI/Windows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -577,9 +507,6 @@ visible = false
 [node name="TimeLoop" type="Timer" parent="."]
 autostart = true
 
-[node name="Player" parent="." instance=ExtResource("13_kp2gw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.885289, -1.19209e-07, 1.6737)
-
 [node name="OnlineObject" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.938625, -1.85565)
 mesh = SubResource("BoxMesh_wkol4")
@@ -587,11 +514,3 @@ mesh = SubResource("BoxMesh_wkol4")
 [connection signal="timeout" from="GUI/Chat/HideChatTimer" to="GUI/Chat" method="_on_hide_chat_timer_timeout"]
 [connection signal="gui_input" from="GUI/Chat/InputContainer/MarginContainer/InputChat" to="GUI/Chat" method="_on_input_chat_gui_input"]
 [connection signal="timeout" from="GUI/Chat/InputContainer/MarginContainer/SpamTimer" to="GUI/Chat" method="_on_spam_timer_timeout"]
-[connection signal="pressed" from="GUI/ConnectMenu/Connect/Panel/Connect" to="GUI/ConnectMenu" method="_on_connect_pressed"]
-[connection signal="pressed" from="GUI/ConnectMenu/Connect/Panel/ToHost" to="GUI/ConnectMenu" method="_on_to_host_pressed"]
-[connection signal="pressed" from="GUI/ConnectMenu/Host/Panel/Host" to="GUI/ConnectMenu" method="_on_host_pressed"]
-[connection signal="pressed" from="GUI/ConnectMenu/Host/Panel/Back" to="GUI/ConnectMenu" method="_on_back_pressed"]
-[connection signal="pressed" from="GUI/LoginMenu/Login/Panel/Login" to="GUI/LoginMenu" method="_on_login_pressed"]
-[connection signal="pressed" from="GUI/LoginMenu/Login/Panel/Registration" to="GUI/LoginMenu" method="_on_registration_pressed"]
-[connection signal="pressed" from="GUI/LoginMenu/Registration/Panel/Register" to="GUI/LoginMenu" method="_on_register_pressed"]
-[connection signal="pressed" from="GUI/LoginMenu/Registration/Panel/Back" to="GUI/LoginMenu" method="_on_back_pressed"]

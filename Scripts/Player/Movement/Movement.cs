@@ -4,7 +4,6 @@ using static Godot.TextServer;
 
 public partial class Movement : CharacterBody3D
 {
-    GUI GUI;
     Camera3D camera;
 
     // speed multipliers
@@ -42,11 +41,10 @@ public partial class Movement : CharacterBody3D
     public override void _Ready()
     {
         // init
-        GUI = GetNode<GUI>("/root/Map/GUI");
         camera = GetNode<Camera3D>("Head");
         // end
 
-        GUI.InputEnabled += InputEnabled;
+        GetNode<GUI>("/root/Map/GUI").PlayerControlsSignal += _player_controls_enabled;
 
         change_speed();
     }
@@ -74,7 +72,7 @@ public partial class Movement : CharacterBody3D
             }
         }
     }
-    void InputEnabled(bool input)
+    void _player_controls_enabled(bool input)
     {
         SetProcessInput(input);
         canMove = input;
@@ -92,7 +90,7 @@ public partial class Movement : CharacterBody3D
         // gets input from WASD
         direction = Vector3.Zero;
         h_rot = GlobalTransform.Basis.GetEuler().Y;
-        
+
         if (canMove)
         {
             f_input = Input.GetActionStrength("move_backwards") - Input.GetActionStrength("move_forwards");

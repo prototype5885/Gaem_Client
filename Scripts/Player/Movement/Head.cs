@@ -3,8 +3,6 @@ using System;
 
 public partial class Head : Camera3D
 {
-    GUI GUI;
-
     CharacterBody3D playerController;
 
     // mouselook
@@ -21,15 +19,12 @@ public partial class Head : Camera3D
     public override void _Ready()
     {
         // init
-        GUI = GetNode<GUI>("/root/Map/GUI");
         playerController = GetOwner<CharacterBody3D>();
         // end
 
-        GUI.InputEnabled += InputEnabled;
+        GetNode<GUI>("/root/Map/GUI").PlayerControlsSignal += PlayerControlsEnabled;
 
         vertical_clamp_angle = Mathf.DegToRad(85f);
-
-        Input.MouseMode = Input.MouseModeEnum.Captured;
     }
     public override void _Input(InputEvent @event)
     {
@@ -44,7 +39,7 @@ public partial class Head : Camera3D
             Rotation = Rotation with { X = Mathf.Clamp(Rotation.X, -vertical_clamp_angle, vertical_clamp_angle) };
         }
     }
-    void InputEnabled(bool input)
+    void PlayerControlsEnabled(bool input)
     {
         SetProcessInput(input);
     }

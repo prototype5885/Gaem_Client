@@ -14,7 +14,7 @@ public partial class Chat : Panel
 
     GUI GUI;
 
-    ClientTCP clientTCP;
+    MultiplayerClient mpClient;
 
     public override void _Ready()
     {
@@ -27,7 +27,7 @@ public partial class Chat : Panel
         messages = messagesMargin.GetChild<VBoxContainer>(0);
         spamTimer = GetNode<Timer>("%SpamTimer");
         GUI = GetParent<GUI>();
-        clientTCP = GetNode<ClientTCP>("/root/Map/MultiplayerManager/Client");
+        mpClient = GetNode<MultiplayerClient>("/root/Map/MultiplayerManager/Client");
         // end
 
         //inputChat.Visible = false;
@@ -41,7 +41,7 @@ public partial class Chat : Panel
             {
                 if (!inputChat.Editable)
                 {
-                    start_typing();
+                    StartTyping();
                 }
                 // else if (canMessage)
                 // {
@@ -50,11 +50,11 @@ public partial class Chat : Panel
             }
             if (Input.IsActionJustPressed("enter") && SpamCooldownEnded)
             {
-                prepare_message(inputChat.Text);
+                PrepareMessage(inputChat.Text);
             }
             else if (Input.IsActionJustPressed("ui_cancel"))
             {
-                clean_message();
+                CleanMessage();
             }
         }
     }
@@ -62,12 +62,12 @@ public partial class Chat : Panel
     {
         if (@event is InputEventMouseButton)
         {
-            clean_message();
+            CleanMessage();
         }
     }
-    private void start_typing()
+    private void StartTyping()
     {
-        GUI.input_enabled(false); // disable controls for player
+        GUI.PlayerControlsEnabled(false); // disable controls for player
         messagesMargin.Visible = true;
         inputPanel.Visible = true;
 
@@ -81,21 +81,21 @@ public partial class Chat : Panel
 
         Input.MouseMode = Input.MouseModeEnum.Visible;
     }
-    void prepare_message(string message)
+    void PrepareMessage(string message)
     {
         if (message != "")
         {
             //Rpc(nameof(SendMessage), message); // send to server
             //SendMessage(message);
-            clientTCP.messageToSend = message;
+            mpClient.messageToSend = message;
             SpamCooldownEnded = false;
             spamTimer.Start();
         }
-        clean_message();
+        CleanMessage();
     }
-    void clean_message()
+    void CleanMessage()
     {
-        GUI.input_enabled(true); // enable controls for player
+        GUI.PlayerControlsEnabled(true); // enable controls for player
         inputChat.PlaceholderText = "Press enter to Chat";
         hideChatTimer.Start();
         inputChat.Text = "";
