@@ -51,29 +51,30 @@ public partial class MultiplayerClient : Node
             GD.Print("Connected");
             isConnected = true;
             StatusLabel.Text = connectedStatus;
-            //Authentication(client);
-            //StartDataTransmission();
-            //SetProcessInput(false);
+
         }
         catch (Exception ex)
         {
             GD.Print($"Failed to connect, exception: {ex}");
         }
     }
-    public bool Authentication(string username, string password)
+    public bool Authentication(bool LoginOrRegister, string username, string password)
     {
+        PasswordHasher passwordHasher = new PasswordHasher();
+        string hashedPassword = passwordHasher.HashPassword(password + "secretxd");
+
         // Sends username / pass to server
         NetworkStream authenticationStream = client.GetStream();
 
 
-        Credentials credentials = new Credentials
+        LoginData loginData = new LoginData
         {
+            lr = LoginOrRegister,
             un = username,
-            pw = password
+            pw = hashedPassword
         };
 
-        string jsonData = JsonConvert.SerializeObject(credentials);
-        GD.Print(jsonData);
+        string jsonData = JsonConvert.SerializeObject(loginData);
 
         byte[] data = Encoding.UTF8.GetBytes(jsonData);
 
@@ -88,16 +89,45 @@ public partial class MultiplayerClient : Node
 
         string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
 
-        if (receivedData != "1")
+        int receivedCode = int.Parse(receivedData);
+
+
+        if (LoginOrRegister == true) // Runs if wanting to login
         {
-            GD.Print("Wrong username or password or some other error.");
-            return false;
+            if (receivedCode != 1)
+            {
+                GD.Print("Wrong username or password.");
+                return false;
+            }
+            else
+            {
+                GD.Print("Username and password accepted.");
+                StartDataTransmission();
+                return true;
+            }
         }
-        else
+        else // Runs if wanting to register
         {
-            GD.Print("Username and password accepted.");
-            StartDataTransmission();
-            return true;
+            if (receivedCode == 1)
+            {
+                GD.Print("Registration successful.");
+                return true;
+            }
+            else if (receivedCode == 2)
+            {
+                GD.Print("Username is too long");
+                return false;
+            }
+            else if (receivedCode == 3)
+            {
+                GD.Print("Username is already taken");
+                return false;
+            }
+            else
+            {
+                GD.Print("Unknown error");
+                return false;
+            }
         }
     }
     void StartDataTransmission()
@@ -166,8 +196,9 @@ public partial class MultiplayerClient : Node
         OnlineObject.Position = OnlineObject.Position with { X = newPosition / 20 };
     }
 }
-public class Credentials
+public class LoginData
 {
+    public bool lr { get; set; } // True if login, false if register
     public string un { get; set; }
     public string pw { get; set; }
 }

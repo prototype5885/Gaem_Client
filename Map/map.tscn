@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=21 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
 [ext_resource type="Script" path="res://Scripts/PlayerManager.cs" id="2_mg52f"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://Scripts/Player/Hud/Hud.cs" id="9_58umg"]
 [ext_resource type="Script" path="res://Scripts/Windows/ConnectWindow.cs" id="9_j43vl"]
 [ext_resource type="Script" path="res://Scripts/Windows/LoginWindow.cs" id="10_jojqg"]
+[ext_resource type="Script" path="res://Scripts/Windows/RegistrationWindow.cs" id="11_p3fko"]
 [ext_resource type="PackedScene" uid="uid://wec1vy3t4ead" path="res://Components/Player.tscn" id="13_kp2gw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fha85"]
@@ -290,6 +291,7 @@ grow_vertical = 2
 text = "Host"
 
 [node name="LoginWindow" type="Control" parent="GUI/Windows"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -327,6 +329,7 @@ offset_bottom = -74.0
 grow_horizontal = 2
 grow_vertical = 2
 placeholder_text = "Username"
+max_length = 16
 
 [node name="Password" type="LineEdit" parent="GUI/Windows/LoginWindow/Panel"]
 layout_mode = 1
@@ -342,6 +345,7 @@ offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
 placeholder_text = "Password"
+max_length = 16
 secret = true
 
 [node name="Login" type="Button" parent="GUI/Windows/LoginWindow/Panel"]
@@ -375,7 +379,6 @@ grow_vertical = 2
 text = "Registration"
 
 [node name="RegistrationWindow" type="Control" parent="GUI/Windows"]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -388,6 +391,7 @@ offset_right = 360.0
 offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("11_p3fko")
 
 [node name="Panel" type="Panel" parent="GUI/Windows/RegistrationWindow"]
 layout_mode = 1
@@ -411,6 +415,7 @@ offset_bottom = -74.0
 grow_horizontal = 2
 grow_vertical = 2
 placeholder_text = "Username"
+max_length = 16
 
 [node name="Password" type="LineEdit" parent="GUI/Windows/RegistrationWindow/Panel"]
 layout_mode = 1
@@ -426,6 +431,7 @@ offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
 placeholder_text = "Password"
+max_length = 16
 secret = true
 
 [node name="Password2" type="LineEdit" parent="GUI/Windows/RegistrationWindow/Panel"]
@@ -441,18 +447,9 @@ offset_right = 242.0
 offset_bottom = 61.0
 grow_horizontal = 2
 grow_vertical = 2
-placeholder_text = "Password again"
+placeholder_text = "Repeat Password"
+max_length = 16
 secret = true
-
-[node name="PassNoMatch" type="Label" parent="GUI/Windows/RegistrationWindow/Panel"]
-visible = false
-layout_mode = 0
-offset_left = 470.0
-offset_top = 254.0
-offset_right = 646.0
-offset_bottom = 277.0
-theme_override_colors/font_color = Color(1, 0, 0, 1)
-text = "Passwords don't match"
 
 [node name="Register" type="Button" parent="GUI/Windows/RegistrationWindow/Panel"]
 layout_mode = 1
@@ -484,6 +481,16 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Back
 "
+
+[node name="PassNoMatch" type="Label" parent="GUI/Windows/RegistrationWindow/Panel"]
+visible = false
+layout_mode = 0
+offset_left = 470.0
+offset_top = 254.0
+offset_right = 650.0
+offset_bottom = 277.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "Passwords don't match"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_cv27n")

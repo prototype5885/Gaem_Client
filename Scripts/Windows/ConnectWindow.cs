@@ -29,7 +29,7 @@ public partial class ConnectWindow : Control
         string ip = InputIP.Text;
         gui.mpClient.Connect(ip, port); // idk why it takes long to open
         if (!gui.mpClient.isConnected) { return; }
-        Visible = false;
+        gui.CloseWindows();
         gui.LoginWindow.Visible = true;
     }
 }

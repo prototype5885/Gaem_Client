@@ -27,10 +27,7 @@ public partial class GUI : Control
 
         Windows.Visible = true;
 
-        foreach (Control window in Windows.GetChildren())
-        {
-            window.Visible = false;
-        }
+        CloseWindows();
 
         ConnectWindow.Visible = true;
 
@@ -47,5 +44,12 @@ public partial class GUI : Control
             Input.MouseMode = Input.MouseModeEnum.Visible;
         }
         EmitSignal(SignalName.PlayerControlsSignal, input);
+    }
+    public void CloseWindows()
+    {
+        foreach (Control window in Windows.GetChildren())
+        {
+            window.Visible = false;
+        }
     }
 }
