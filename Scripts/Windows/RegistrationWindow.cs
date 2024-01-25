@@ -8,6 +8,7 @@ public partial class RegistrationWindow : Control
     LineEdit UsernameInput;
     LineEdit FirstPasswordInput;
     LineEdit SecondPasswordInput;
+    Label ErrorLabel;
 
     public override void _Ready()
     {
@@ -17,6 +18,7 @@ public partial class RegistrationWindow : Control
         UsernameInput = panel.GetChild<LineEdit>(0);
         FirstPasswordInput = panel.GetChild<LineEdit>(1);
         SecondPasswordInput = panel.GetChild<LineEdit>(2);
+        ErrorLabel = panel.GetChild<Label>(5);
         // end
 
         panel.GetChild<Button>(3).Pressed += () => _on_register_pressed();
@@ -28,14 +30,26 @@ public partial class RegistrationWindow : Control
         string password = FirstPasswordInput.Text;
         string secondPassword = SecondPasswordInput.Text;
 
-        if (password != secondPassword) { return; }
+        if (password != secondPassword)
+        {
+            ErrorLabel.Text = "Passwords don't match";
+            return;
+        }
 
-        bool registerSuccessful = gui.mpClient.Authentication(false, username, password);
+        int registerCode = gui.mpClient.Authentication(false, username, password);
 
-        if (registerSuccessful)
+        if (registerCode == 1)
         {
             gui.CloseWindows();
             gui.PlayerControlsEnabled(true);
+        }
+        else if (registerCode == 2)
+        {
+            ErrorLabel.Text = "Max 16 characters allowed for username";
+        }
+        else if (registerCode == 3)
+        {
+            ErrorLabel.Text = "Username is already taken.";
         }
     }
     void _on_back_pressed()

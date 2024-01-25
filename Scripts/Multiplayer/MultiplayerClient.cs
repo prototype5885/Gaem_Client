@@ -58,7 +58,7 @@ public partial class MultiplayerClient : Node
             GD.Print($"Failed to connect, exception: {ex}");
         }
     }
-    public bool Authentication(bool LoginOrRegister, string username, string password)
+    public int Authentication(bool LoginOrRegister, string username, string password)
     {
         PasswordHasher passwordHasher = new PasswordHasher();
         string hashedPassword = passwordHasher.HashPassword(password + "secretxd");
@@ -94,39 +94,34 @@ public partial class MultiplayerClient : Node
 
         if (LoginOrRegister == true) // Runs if wanting to login
         {
-            if (receivedCode != 1)
+            if (receivedCode == 1) // Login successful
             {
-                GD.Print("Wrong username or password.");
-                return false;
-            }
-            else
-            {
-                GD.Print("Username and password accepted.");
                 StartDataTransmission();
-                return true;
+                return 1;
+            }
+            else // Possibly wrong username or password
+            {
+                return 0;
             }
         }
         else // Runs if wanting to register
         {
-            if (receivedCode == 1)
+            if (receivedCode == 1) // Registration successful
             {
-                GD.Print("Registration successful.");
-                return true;
+                StartDataTransmission();
+                return 1;
             }
-            else if (receivedCode == 2)
+            else if (receivedCode == 2) // Username is longer than 16 characters
             {
-                GD.Print("Username is too long");
-                return false;
+                return 2;
             }
-            else if (receivedCode == 3)
+            else if (receivedCode == 3) // Username is already taken
             {
-                GD.Print("Username is already taken");
-                return false;
+                return 3;
             }
-            else
+            else // Unknown error
             {
-                GD.Print("Unknown error");
-                return false;
+                return 0;
             }
         }
     }

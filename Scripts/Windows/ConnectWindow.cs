@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text;
 
 public partial class ConnectWindow : Control
 {
@@ -7,6 +9,18 @@ public partial class ConnectWindow : Control
     LineEdit InputIP;
     LineEdit InputPort;
 
+    string ip = "";
+
+    public override void _Input(InputEvent @event)
+    {
+        if (@event is InputEventKey)
+        {
+            if (Input.IsActionJustPressed("join"))
+            {
+                _on_connect_pressed();
+            }
+        }
+    }
     public override void _Ready()
     {
         // init
@@ -21,15 +35,26 @@ public partial class ConnectWindow : Control
 
     void _on_connect_pressed()
     {
-        if (!int.TryParse(InputPort.Text, out int port))
+        try
         {
-            return;
-        }
+            if (!int.TryParse(InputPort.Text, out int port))
+            {
+                GD.Print("Wrong port format");
+                return;
+            }
 
-        string ip = InputIP.Text;
-        gui.mpClient.Connect(ip, port); // idk why it takes long to open
-        if (!gui.mpClient.isConnected) { return; }
-        gui.CloseWindows();
-        gui.LoginWindow.Visible = true;
+            string ip = InputIP.Text;
+
+            if (ip == "localhost") { ip = "127.0.0.1"; }
+
+            gui.mpClient.Connect(ip, port); // Note: dont use "localhost" for ip
+            if (!gui.mpClient.isConnected) { return; }
+            gui.CloseWindows();
+            gui.LoginWindow.Visible = true;
+        }
+        catch (Exception ex)
+        {
+            GD.Print(ex);
+        }
     }
 }

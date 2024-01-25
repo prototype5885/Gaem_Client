@@ -27,7 +27,7 @@ public partial class Chat : Panel
         messages = messagesMargin.GetChild<VBoxContainer>(0);
         spamTimer = GetNode<Timer>("%SpamTimer");
         GUI = GetParent<GUI>();
-        mpClient = GetNode<MultiplayerClient>("/root/Map/MultiplayerManager/Client");
+        mpClient = GetNode<MultiplayerClient>("/root/Map/MultiplayerManager");
         // end
 
         //inputChat.Visible = false;

@@ -16,7 +16,7 @@ public partial class GUI : Control
     public override void _Ready()
     {
         // init
-        mpClient = GetNode<MultiplayerClient>("/root/Map/MultiplayerManager/Client");
+        mpClient = GetNode<MultiplayerClient>("/root/Map/MultiplayerManager");
 
         Windows = GetChild<Control>(1);
 

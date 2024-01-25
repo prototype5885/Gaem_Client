@@ -41,11 +41,9 @@ data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0
 [node name="Map" type="Node3D"]
 
 [node name="MultiplayerManager" type="Node" parent="."]
-
-[node name="Client" type="Node" parent="MultiplayerManager"]
 script = ExtResource("4_qs75a")
 
-[node name="StatusLabel" type="Label" parent="MultiplayerManager/Client"]
+[node name="StatusLabel" type="Label" parent="MultiplayerManager"]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -243,6 +241,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "localhost"
 placeholder_text = "IP Address"
+max_length = 32
 
 [node name="Port" type="LineEdit" parent="GUI/Windows/ConnectWindow/Panel"]
 layout_mode = 1
@@ -259,6 +258,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "1942"
 placeholder_text = "Port"
+max_length = 16
 
 [node name="Connect" type="Button" parent="GUI/Windows/ConnectWindow/Panel"]
 layout_mode = 1
@@ -274,21 +274,6 @@ offset_bottom = 64.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Connect"
-
-[node name="ToHost" type="Button" parent="GUI/Windows/ConnectWindow/Panel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 212.0
-offset_top = 113.0
-offset_right = 346.0
-offset_bottom = 167.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Host"
 
 [node name="LoginWindow" type="Control" parent="GUI/Windows"]
 visible = false
@@ -378,7 +363,20 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Registration"
 
+[node name="ErrorLabel" type="Label" parent="GUI/Windows/LoginWindow/Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -119.0
+offset_right = 119.0
+offset_bottom = 53.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+vertical_alignment = 1
+
 [node name="RegistrationWindow" type="Control" parent="GUI/Windows"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -482,15 +480,17 @@ grow_vertical = 2
 text = "Back
 "
 
-[node name="PassNoMatch" type="Label" parent="GUI/Windows/RegistrationWindow/Panel"]
-visible = false
-layout_mode = 0
-offset_left = 470.0
-offset_top = 254.0
-offset_right = 650.0
-offset_bottom = 277.0
+[node name="Errolabel" type="Label" parent="GUI/Windows/RegistrationWindow/Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -119.0
+offset_right = 119.0
+offset_bottom = 53.0
+grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)
-text = "Passwords don't match"
+vertical_alignment = 1
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_cv27n")
