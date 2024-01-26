@@ -1,11 +1,12 @@
 using Godot;
-using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.IO;
+using System.Net.Mail;
 using System.Net.Sockets;
 using System.Runtime.Intrinsics.Arm;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,15 +21,21 @@ public partial class MultiplayerClient : Node
     const string disconnectedStatus = "Disconnected";
 
     //float[] ServerPositions = new float[16];
-    public string messageToSend = "";
 
     public bool isConnected = false;
+
+    public LocalPlayerPosition localPlayerPosition = new LocalPlayerPosition();
+    PlayersManager playersManager;
+
+    CharacterBody3D localPlayer;
 
     public override void _Ready()
     {
         // init
         OnlineObject = GetNode<MeshInstance3D>("/root/Map/OnlineObject");
         StatusLabel = GetChild<Label>(0);
+        playersManager = GetNode<PlayersManager>("/root/Map/PlayersManager");
+        //player = GetNode<>
         // end
         StatusLabel.Text = disconnectedStatus;
     }
@@ -74,9 +81,9 @@ public partial class MultiplayerClient : Node
             pw = hashedPassword
         };
 
-        string jsonData = JsonConvert.SerializeObject(loginData);
+        string jsonData = JsonSerializer.Serialize(loginData);
 
-        byte[] data = Encoding.UTF8.GetBytes(jsonData);
+        byte[] data = Encoding.ASCII.GetBytes(jsonData);
 
         authenticationStream.Write(data, 0, data.Length);
         //authenticationStream.Close();
@@ -87,7 +94,7 @@ public partial class MultiplayerClient : Node
 
         bytesRead = authenticationStream.Read(receivedBytes, 0, receivedBytes.Length);
 
-        string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
+        string receivedData = Encoding.UTF8.GetString(receivedBytes, 0, bytesRead);
 
         int receivedCode = int.Parse(receivedData);
 
@@ -96,6 +103,7 @@ public partial class MultiplayerClient : Node
         {
             if (receivedCode == 1) // Login successful
             {
+                playersManager.SpawnPlayer();
                 StartDataTransmission();
                 return 1;
             }
@@ -108,6 +116,7 @@ public partial class MultiplayerClient : Node
         {
             if (receivedCode == 1) // Registration successful
             {
+                playersManager.SpawnPlayer();
                 StartDataTransmission();
                 return 1;
             }
@@ -144,10 +153,9 @@ public partial class MultiplayerClient : Node
 
                 string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
 
+                //EveryPlayerPosition everyPlayerPosition = JsonSerializer.Deserialize(receivedData);
 
-                GD.Print($"Received from server: {receivedData}");
-
-                receivingStream.Flush();
+                await receivingStream.FlushAsync();
             }
             catch (Exception ex)
             {
@@ -165,18 +173,18 @@ public partial class MultiplayerClient : Node
             {
                 StreamReader reader = new StreamReader(sendingStream);
 
-                byte[] messageByte = Encoding.ASCII.GetBytes(messageToSend);
+                string jsonData = JsonSerializer.Serialize(localPlayerPosition);
+                byte[] messageByte = Encoding.ASCII.GetBytes(jsonData);
                 await sendingStream.WriteAsync(messageByte, 0, messageByte.Length);
 
-                sendingStream.Flush();
-                messageToSend = "lol";
+                await sendingStream.FlushAsync();
             }
             catch (Exception ex)
             {
                 CallDeferred(nameof(LostConnection), ex.ToString());
                 break;
             }
-            Thread.Sleep(50);
+            Thread.Sleep(100);
         }
     }
     void LostConnection(string ex)
@@ -190,10 +198,4 @@ public partial class MultiplayerClient : Node
     {
         OnlineObject.Position = OnlineObject.Position with { X = newPosition / 20 };
     }
-}
-public class LoginData
-{
-    public bool lr { get; set; } // True if login, false if register
-    public string un { get; set; }
-    public string pw { get; set; }
 }

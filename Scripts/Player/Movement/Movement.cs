@@ -81,6 +81,8 @@ public partial class Movement : CharacterBody3D
     {
         movement((float)delta);
         MoveAndSlide();
+
+
     }
     void movement(float delta)
     {

@@ -87,7 +87,7 @@ public partial class Chat : Panel
         {
             //Rpc(nameof(SendMessage), message); // send to server
             //SendMessage(message);
-            mpClient.messageToSend = message;
+            //mpClient.messageToSend = message;
             SpamCooldownEnded = false;
             spamTimer.Start();
         }

@@ -1,7 +1,7 @@
-[gd_scene load_steps=21 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=20 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
-[ext_resource type="Script" path="res://Scripts/PlayerManager.cs" id="2_mg52f"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/PlayersManager.cs" id="2_5b6b8"]
 [ext_resource type="Script" path="res://Scripts/Multiplayer/MultiplayerClient.cs" id="4_qs75a"]
 [ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
 [ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
@@ -10,7 +10,6 @@
 [ext_resource type="Script" path="res://Scripts/Windows/ConnectWindow.cs" id="9_j43vl"]
 [ext_resource type="Script" path="res://Scripts/Windows/LoginWindow.cs" id="10_jojqg"]
 [ext_resource type="Script" path="res://Scripts/Windows/RegistrationWindow.cs" id="11_p3fko"]
-[ext_resource type="PackedScene" uid="uid://wec1vy3t4ead" path="res://Components/Player.tscn" id="13_kp2gw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fha85"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -51,14 +50,15 @@ offset_left = -900.0
 offset_bottom = 307.0
 grow_horizontal = 0
 theme_override_font_sizes/font_size = 64
-text = "Connection Status"
+text = "Disconnected"
 horizontal_alignment = 2
 
-[node name="PlayerManager" type="Node" parent="."]
-script = ExtResource("2_mg52f")
+[node name="PlayersManager" type="Node3D" parent="."]
+script = ExtResource("2_5b6b8")
 
-[node name="Player" parent="PlayerManager" instance=ExtResource("13_kp2gw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.885289, -1.19209e-07, 1.6737)
+[node name="LocalPlayer" type="Node3D" parent="PlayersManager"]
+
+[node name="OtherPlayers" type="Node3D" parent="PlayersManager"]
 
 [node name="HUD" type="Control" parent="."]
 visible = false
@@ -313,6 +313,7 @@ offset_right = 242.0
 offset_bottom = -74.0
 grow_horizontal = 2
 grow_vertical = 2
+text = "user"
 placeholder_text = "Username"
 max_length = 16
 
@@ -329,6 +330,7 @@ offset_right = 242.0
 offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
+text = "xd"
 placeholder_text = "Password"
 max_length = 16
 secret = true
