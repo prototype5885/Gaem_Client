@@ -1,6 +1,8 @@
 using Godot;
+using Godot.Collections;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Mail;
 using System.Net.Sockets;
@@ -153,7 +155,15 @@ public partial class MultiplayerClient : Node
 
                 string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
 
-                //EveryPlayerPosition everyPlayerPosition = JsonSerializer.Deserialize(receivedData);
+                //try
+                //{
+                //    EveryPlayerPosition everyPlayerPosition = JsonSerializer.Deserialize(receivedData, EveryPlayerPositionContext.Default.EveryPlayerPosition);
+                //    playersManager.ProcessOtherPlayerPosition(everyPlayerPosition.epp);
+                //}
+                //catch (Exception ex)
+                //{
+                //    GD.Print(ex);
+                //}
 
                 await receivingStream.FlushAsync();
             }
@@ -174,9 +184,8 @@ public partial class MultiplayerClient : Node
                 StreamReader reader = new StreamReader(sendingStream);
 
                 string jsonData = JsonSerializer.Serialize(localPlayerPosition);
-                byte[] messageByte = Encoding.ASCII.GetBytes(jsonData);
+                byte[] messageByte = Encoding.ASCII.GetBytes($"{jsonData.Length}" + jsonData);
                 await sendingStream.WriteAsync(messageByte, 0, messageByte.Length);
-
                 await sendingStream.FlushAsync();
             }
             catch (Exception ex)

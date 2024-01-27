@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class PlayersManager : Node3D
 {
@@ -24,5 +25,12 @@ public partial class PlayersManager : Node3D
         mpClient.localPlayerPosition.x = player.Position.X;
         mpClient.localPlayerPosition.y = player.Position.Y;
         mpClient.localPlayerPosition.z = player.Position.Z;
+    }
+    public void ProcessOtherPlayerPosition(Dictionary<int, (float, float, float)> everyPlayerPosition)
+    {
+        foreach (var kvp in everyPlayerPosition)
+        {
+            Console.WriteLine(kvp);
+        }
     }
 }

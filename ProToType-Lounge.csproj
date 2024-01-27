@@ -6,5 +6,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>ProToTypeLounge</RootNamespace>
     <ImplicitUsings>disable</ImplicitUsings>
+    <OutputType>Library</OutputType>
+    <PackAsTool>False</PackAsTool>
   </PropertyGroup>
 </Project>

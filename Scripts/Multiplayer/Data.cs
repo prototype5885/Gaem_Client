@@ -13,3 +13,13 @@ public class LocalPlayerPosition
     public float y { get; set; } // Player position Y
     public float z { get; set; } // Player position Z
 }
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(EveryPlayerPosition))]
+internal partial class EveryPlayerPositionContext : JsonSerializerContext
+{
+}
+public class EveryPlayerPosition
+{
+    public Dictionary<int, (float, float, float)> epp { get; set; }
+}
