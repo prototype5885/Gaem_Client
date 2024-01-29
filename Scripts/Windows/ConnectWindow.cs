@@ -48,8 +48,8 @@ public partial class ConnectWindow : Control
 
             if (ip == "localhost") { ip = "127.0.0.1"; }
 
-            gui.mpClient.Connect(ip, port); // Note: dont use "localhost" for ip
-            if (!gui.mpClient.isConnected)
+            gui.tcpClient.Connect(ip, port); // Note: dont use "localhost" for ip
+            if (!gui.tcpClient.isConnected)
             {
                 return;
             }

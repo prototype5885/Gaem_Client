@@ -14,7 +14,7 @@ public partial class Chat : Panel
 
     GUI GUI;
 
-    MultiplayerClient mpClient;
+    TCPClient TCPClient;
 
     public override void _Ready()
     {
@@ -27,7 +27,7 @@ public partial class Chat : Panel
         messages = messagesMargin.GetChild<VBoxContainer>(0);
         spamTimer = GetNode<Timer>("%SpamTimer");
         GUI = GetParent<GUI>();
-        mpClient = GetNode<MultiplayerClient>("/root/Map/MultiplayerManager");
+        TCPClient = GetNode<TCPClient>("/root/Map/MultiplayerManager/TCPClient");
         // end
 
         //inputChat.Visible = false;

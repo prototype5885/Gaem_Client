@@ -24,7 +24,7 @@ public partial class LoginWindow : Control
     }
     void _on_login_pressed()
     {
-        int loginCode = gui.mpClient.Authentication(true, UsernameInput.Text, PasswordInput.Text);
+        int loginCode = gui.tcpClient.Authentication(true, UsernameInput.Text, PasswordInput.Text);
 
         if (loginCode == 1)
         {

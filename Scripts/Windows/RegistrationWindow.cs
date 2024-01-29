@@ -36,7 +36,7 @@ public partial class RegistrationWindow : Control
             return;
         }
 
-        int registerCode = gui.mpClient.Authentication(false, username, password);
+        int registerCode = gui.tcpClient.Authentication(false, username, password);
 
         if (registerCode == 1)
         {

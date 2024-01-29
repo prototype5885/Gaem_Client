@@ -1,8 +1,9 @@
-[gd_scene load_steps=20 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=21 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
 [ext_resource type="Script" path="res://Scripts/Multiplayer/PlayersManager.cs" id="2_5b6b8"]
-[ext_resource type="Script" path="res://Scripts/Multiplayer/MultiplayerClient.cs" id="4_qs75a"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/UDPClient.cs" id="2_yqixv"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/TCPClient.cs" id="4_qs75a"]
 [ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
 [ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
 [ext_resource type="Theme" uid="uid://b25nqr38ccaa0" path="res://Etc/HUD.tres" id="8_57x1o"]
@@ -40,7 +41,12 @@ data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0
 [node name="Map" type="Node3D"]
 
 [node name="MultiplayerManager" type="Node" parent="."]
+
+[node name="TCPClient" type="Node" parent="MultiplayerManager"]
 script = ExtResource("4_qs75a")
+
+[node name="UDPClient" type="Node" parent="MultiplayerManager"]
+script = ExtResource("2_yqixv")
 
 [node name="StatusLabel" type="Label" parent="MultiplayerManager"]
 anchors_preset = 1
@@ -49,7 +55,7 @@ anchor_right = 1.0
 offset_left = -900.0
 offset_bottom = 307.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 32
 text = "Disconnected"
 horizontal_alignment = 2
 

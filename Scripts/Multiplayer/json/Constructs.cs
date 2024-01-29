@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 public class LoginData
 {
@@ -7,19 +6,18 @@ public class LoginData
     public string un { get; set; } // Username
     public string pw { get; set; } // Password
 }
-public class LocalPlayerPosition
+public class Player
 {
     public float x { get; set; } // Player position X
     public float y { get; set; } // Player position Y
     public float z { get; set; } // Player position Z
 }
-
-[JsonSourceGenerationOptions(WriteIndented = true)]
-[JsonSerializable(typeof(EveryPlayerPosition))]
-internal partial class EveryPlayerPositionContext : JsonSerializerContext
+public class Players
 {
+    public Player[] list { get; set; }
 }
-public class EveryPlayerPosition
+public class InitialData
 {
-    public Dictionary<int, (float, float, float)> epp { get; set; }
+    public int i { get; set; }
+    public int mp { get; set; }
 }
