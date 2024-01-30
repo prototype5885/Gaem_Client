@@ -1,12 +1,36 @@
-[gd_scene load_steps=2 format=3 uid="uid://hripapb3n2jv"]
+[gd_scene load_steps=5 format=3 uid="uid://hripapb3n2jv"]
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_bxar5"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ikd3v"]
+albedo_color = Color(1, 0, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jlrli"]
+material = SubResource("StandardMaterial3D_ikd3v")
+size = Vector3(0.25, 0.25, 0.25)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_3ehfc"]
 top_radius = 0.25
 bottom_radius = 0.25
 height = 1.8
 
-[node name="Node3D" type="Node3D"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_uckwv"]
+height = 1.8
+radius = 0.25
 
-[node name="PuppetPlayer" type="MeshInstance3D" parent="."]
+[node name="PuppetPlayer" type="CharacterBody3D"]
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+
+[node name="Head" type="MeshInstance3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.104393, -0.309117)
+mesh = SubResource("BoxMesh_jlrli")
+skeleton = NodePath("../../Body")
+
+[node name="Body" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-mesh = SubResource("CylinderMesh_bxar5")
+mesh = SubResource("CylinderMesh_3ehfc")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CylinderShape3D_uckwv")
+disabled = true

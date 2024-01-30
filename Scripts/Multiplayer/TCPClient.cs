@@ -27,7 +27,7 @@ public partial class TCPClient : Node
     //public Player localPlayer = new Player();
     PlayersManager playersManager;
 
-    public Player localPlayer = new Player();
+
 
     public override void _Ready()
     {
@@ -128,15 +128,21 @@ public partial class TCPClient : Node
     {
         GD.Print("Authentication successful, waiting for server to send initial data");
         StatusLabel.Text = "Authentication successful, waiting for server to send initial data";
-        NetworkStream receivingStream = client.GetStream();
+        NetworkStream receivingInitStream = client.GetStream();
         byte[] receivedBytes = new byte[1024];
         int bytesRead;
-        bytesRead = receivingStream.Read(receivedBytes, 0, receivedBytes.Length);
+        bytesRead = receivingInitStream.Read(receivedBytes, 0, receivedBytes.Length);
         string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
+        GD.Print(receivedData);
+        receivingInitStream.Flush();
+
+        Thread.Sleep(250); // Workaround so it wont mix up package with the new ones from ReceiveDataTCP
+
 
         InitialData initialData = JsonSerializer.Deserialize(receivedData, InitialDataContext.Default.InitialData);
 
         playersManager.PreSpawnPuppets(initialData.i, initialData.mp); // Sets the max amount of players the server can have and sets the index so the puppet of the local player wont be visible
+
 
         Task.Run(() => ReceiveDataTCP());
         Task.Run(() => SendDataTCP());
@@ -182,7 +188,7 @@ public partial class TCPClient : Node
             {
                 StreamReader reader = new StreamReader(sendingStream);
 
-                string jsonData = JsonSerializer.Serialize(localPlayer, PlayerContext.Default.Player);
+                string jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerContext.Default.Player);
                 byte[] messageByte = Encoding.ASCII.GetBytes($"#{jsonData.Length}#" + jsonData);
                 await sendingStream.WriteAsync(messageByte, 0, messageByte.Length);
                 await sendingStream.FlushAsync();
@@ -193,7 +199,7 @@ public partial class TCPClient : Node
                 //CallDeferred(nameof(LostConnection), ex.ToString());
                 //break;
             }
-            Thread.Sleep(25);
+            Thread.Sleep(50);
         }
     }
     void LostConnection(string ex)

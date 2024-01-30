@@ -1,17 +1,24 @@
-[gd_scene load_steps=6 format=3 uid="uid://wec1vy3t4ead"]
+[gd_scene load_steps=8 format=3 uid="uid://wec1vy3t4ead"]
 
 [ext_resource type="Script" path="res://Scripts/Player/Movement/Movement.cs" id="1_gr8pd"]
 [ext_resource type="Script" path="res://Scripts/Player/Movement/Head.cs" id="2_5v168"]
 [ext_resource type="Script" path="res://Scripts/Player/Stats.cs" id="5_fq7b4"]
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_2pmjy"]
-height = 1.8
-radius = 0.25
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mlxf7"]
+albedo_color = Color(1, 0, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_76208"]
+material = SubResource("StandardMaterial3D_mlxf7")
+size = Vector3(0.25, 0.25, 0.25)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_bxar5"]
 top_radius = 0.25
 bottom_radius = 0.25
 height = 1.8
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_2pmjy"]
+height = 1.8
+radius = 0.25
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_gr8pd")
@@ -22,13 +29,20 @@ current = true
 fov = 90.0
 script = ExtResource("2_5v168")
 
+[node name="Head" type="MeshInstance3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.104393, -0.309117)
+cast_shadow = 3
+mesh = SubResource("BoxMesh_76208")
+skeleton = NodePath("../../Body")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+cast_shadow = 3
+mesh = SubResource("CylinderMesh_bxar5")
+
 [node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CylinderShape3D_2pmjy")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-mesh = SubResource("CylinderMesh_bxar5")
 
 [node name="Stats" type="Node" parent="."]
 unique_name_in_owner = true
