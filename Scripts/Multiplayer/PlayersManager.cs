@@ -19,7 +19,7 @@ public partial class PlayersManager : Node3D
     public Vector3[] puppetRotations; // Rotation of puppet players
 
 
-    public bool interpolatePuppets = true;
+    public bool interpolatePuppetPositions = false;
 
     public override void _Ready()
     {
@@ -96,7 +96,7 @@ public partial class PlayersManager : Node3D
             Vector3 puppetRotation = puppet.Rotation; // Local rotation value of the puppet
             Vector3 puppetHeadRotation = puppetHead.Rotation; // Local rotation value of the puppet head
 
-            if (interpolatePuppets)
+            if (interpolatePuppetPositions)
             {
                 puppetPosition.X = Mathf.Lerp(puppetPosition.X, puppetPositions[i].X, speed);
                 puppetPosition.Y = Mathf.Lerp(puppetPosition.Y, puppetPositions[i].Y, speed);

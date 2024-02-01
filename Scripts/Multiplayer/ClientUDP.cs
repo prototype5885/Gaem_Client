@@ -183,7 +183,7 @@ public partial class ClientUDP : Node
             {
                 UdpReceiveResult udpReceiveResult = await udpClient.ReceiveAsync();
                 string receivedData = Encoding.ASCII.GetString(udpReceiveResult.Buffer);
-                GD.Print(receivedData);
+                //GD.Print(receivedData);
                 playersManager.players = JsonSerializer.Deserialize(receivedData, PlayersContext.Default.Players);
                 playersManager.CallDeferred(nameof(playersManager.ProcessOtherPlayerPosition));
             }
@@ -208,7 +208,7 @@ public partial class ClientUDP : Node
             {
                 GD.Print("Error sending UDP packet");
             }
-            Thread.Sleep(50);
+            Thread.Sleep(10);
         }
     }
 }
