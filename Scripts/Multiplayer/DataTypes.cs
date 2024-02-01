@@ -16,6 +16,11 @@ public class Player
     public float rx { get; set; } // Player head rotation X
     public float ry { get; set; } // Player head rotation Y
     public float rz { get; set; } // Player head rotation Z
+
+    public override string ToString()
+    {
+        return $"X:{x}, Y:{y}, Z:{z}, rX:{rx}, rY:{ry}, rZ:{rz}";
+    }
 }
 public class Players
 {
@@ -25,4 +30,9 @@ public class InitialData
 {
     public int i { get; set; }
     public int mp { get; set; }
+}
+public class Packet
+{
+    public int packetType { get; set; }
+    public string packetString { get; set; }
 }

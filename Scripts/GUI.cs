@@ -4,7 +4,8 @@ public partial class GUI : Control
 {
     [Signal] public delegate void PlayerControlsSignalEventHandler(bool input);
 
-    public TCPClient tcpClient;
+    public ClientTCP clientTCP;
+    public ClientUDP clientUDP;
 
     Control Windows;
 
@@ -12,17 +13,20 @@ public partial class GUI : Control
     public Control LoginWindow;
     public Control RegistrationWindow;
 
+    public Label errorLabel;
 
     public override void _Ready()
     {
         // init
-        tcpClient = GetNode<TCPClient>("/root/Map/MultiplayerManager/TCPClient");
+        clientTCP = GetNode<ClientTCP>("/root/Map/MultiplayerManager/ClientTCP");
+        clientUDP = GetNode<ClientUDP>("/root/Map/MultiplayerManager/ClientUDP");
 
         Windows = GetChild<Control>(1);
 
         ConnectWindow = Windows.GetChild<Control>(0);
         LoginWindow = Windows.GetChild<Control>(1);
         RegistrationWindow = Windows.GetChild<Control>(2);
+        errorLabel = Windows.GetChild<Label>(3);
         // end
 
         Windows.Visible = true;
@@ -49,7 +53,15 @@ public partial class GUI : Control
     {
         foreach (Control window in Windows.GetChildren())
         {
-            window.Visible = false;
+            if (window != errorLabel)
+            {
+                window.Visible = false;
+            }
         }
+    }
+    public void BackToConnectWindow()
+    {
+        CloseWindows();
+        ConnectWindow.Visible = true;
     }
 }

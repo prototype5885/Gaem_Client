@@ -1,8 +1,9 @@
-[gd_scene load_steps=20 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=21 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/ClientTCP.cs" id="1_yf8r8"]
 [ext_resource type="Script" path="res://Scripts/Multiplayer/PlayersManager.cs" id="2_5b6b8"]
-[ext_resource type="Script" path="res://Scripts/Multiplayer/TCPClient.cs" id="4_qs75a"]
+[ext_resource type="Script" path="res://Scripts/Multiplayer/ClientUDP.cs" id="2_7pnnp"]
 [ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
 [ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
 [ext_resource type="Theme" uid="uid://b25nqr38ccaa0" path="res://Etc/HUD.tres" id="8_57x1o"]
@@ -41,10 +42,11 @@ data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0
 
 [node name="MultiplayerManager" type="Node" parent="."]
 
-[node name="TCPClient" type="Node" parent="MultiplayerManager"]
-script = ExtResource("4_qs75a")
+[node name="ClientTCP" type="Node" parent="MultiplayerManager"]
+script = ExtResource("1_yf8r8")
 
-[node name="UDPClient" type="Node" parent="MultiplayerManager"]
+[node name="ClientUDP" type="Node" parent="MultiplayerManager"]
+script = ExtResource("2_7pnnp")
 
 [node name="StatusLabel" type="Label" parent="MultiplayerManager"]
 anchors_preset = 1
@@ -197,7 +199,7 @@ unique_name_in_owner = true
 wait_time = 0.25
 one_shot = true
 
-[node name="Windows" type="Control" parent="GUI"]
+[node name="JoinWindows" type="Control" parent="GUI"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -205,7 +207,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ConnectWindow" type="Control" parent="GUI/Windows"]
+[node name="ConnectWindow" type="Control" parent="GUI/JoinWindows"]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -222,7 +224,7 @@ grow_vertical = 2
 theme = ExtResource("1_k5sxp")
 script = ExtResource("9_j43vl")
 
-[node name="Panel" type="Panel" parent="GUI/Windows/ConnectWindow"]
+[node name="Panel" type="Panel" parent="GUI/JoinWindows/ConnectWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -230,7 +232,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="IP" type="LineEdit" parent="GUI/Windows/ConnectWindow/Panel"]
+[node name="IP" type="LineEdit" parent="GUI/JoinWindows/ConnectWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -243,11 +245,11 @@ offset_right = 86.0
 offset_bottom = -42.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "localhost"
+text = "prototype585.asuscomm.com"
 placeholder_text = "IP Address"
 max_length = 32
 
-[node name="Port" type="LineEdit" parent="GUI/Windows/ConnectWindow/Panel"]
+[node name="Port" type="LineEdit" parent="GUI/JoinWindows/ConnectWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -260,11 +262,11 @@ offset_right = 242.0
 offset_bottom = -42.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "1942"
+text = "1943"
 placeholder_text = "Port"
 max_length = 16
 
-[node name="Connect" type="Button" parent="GUI/Windows/ConnectWindow/Panel"]
+[node name="Connect" type="Button" parent="GUI/JoinWindows/ConnectWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -279,7 +281,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Connect"
 
-[node name="LoginWindow" type="Control" parent="GUI/Windows"]
+[node name="LoginWindow" type="Control" parent="GUI/JoinWindows"]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -296,7 +298,7 @@ grow_vertical = 2
 theme = ExtResource("1_k5sxp")
 script = ExtResource("10_jojqg")
 
-[node name="Panel" type="Panel" parent="GUI/Windows/LoginWindow"]
+[node name="Panel" type="Panel" parent="GUI/JoinWindows/LoginWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -304,7 +306,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Username" type="LineEdit" parent="GUI/Windows/LoginWindow/Panel"]
+[node name="Username" type="LineEdit" parent="GUI/JoinWindows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -321,7 +323,7 @@ text = "user"
 placeholder_text = "Username"
 max_length = 16
 
-[node name="Password" type="LineEdit" parent="GUI/Windows/LoginWindow/Panel"]
+[node name="Password" type="LineEdit" parent="GUI/JoinWindows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -339,7 +341,7 @@ placeholder_text = "Password"
 max_length = 16
 secret = true
 
-[node name="Login" type="Button" parent="GUI/Windows/LoginWindow/Panel"]
+[node name="Login" type="Button" parent="GUI/JoinWindows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -354,7 +356,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Login"
 
-[node name="Registration" type="Button" parent="GUI/Windows/LoginWindow/Panel"]
+[node name="Registration" type="Button" parent="GUI/JoinWindows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -369,19 +371,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Registration"
 
-[node name="ErrorLabel" type="Label" parent="GUI/Windows/LoginWindow/Panel"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -119.0
-offset_right = 119.0
-offset_bottom = 53.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(1, 0, 0, 1)
-vertical_alignment = 1
-
-[node name="RegistrationWindow" type="Control" parent="GUI/Windows"]
+[node name="RegistrationWindow" type="Control" parent="GUI/JoinWindows"]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -397,7 +387,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("11_p3fko")
 
-[node name="Panel" type="Panel" parent="GUI/Windows/RegistrationWindow"]
+[node name="Panel" type="Panel" parent="GUI/JoinWindows/RegistrationWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -405,7 +395,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Username" type="LineEdit" parent="GUI/Windows/RegistrationWindow/Panel"]
+[node name="Username" type="LineEdit" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -421,7 +411,7 @@ grow_vertical = 2
 placeholder_text = "Username"
 max_length = 16
 
-[node name="Password" type="LineEdit" parent="GUI/Windows/RegistrationWindow/Panel"]
+[node name="Password" type="LineEdit" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -438,7 +428,7 @@ placeholder_text = "Password"
 max_length = 16
 secret = true
 
-[node name="Password2" type="LineEdit" parent="GUI/Windows/RegistrationWindow/Panel"]
+[node name="Password2" type="LineEdit" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -455,7 +445,7 @@ placeholder_text = "Repeat Password"
 max_length = 16
 secret = true
 
-[node name="Register" type="Button" parent="GUI/Windows/RegistrationWindow/Panel"]
+[node name="Register" type="Button" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -470,7 +460,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Register"
 
-[node name="Back" type="Button" parent="GUI/Windows/RegistrationWindow/Panel"]
+[node name="Back" type="Button" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -486,15 +476,19 @@ grow_vertical = 2
 text = "Back
 "
 
-[node name="Errolabel" type="Label" parent="GUI/Windows/RegistrationWindow/Panel"]
+[node name="ErrorLabel" type="Label" parent="GUI/JoinWindows"]
 layout_mode = 1
-anchors_preset = 5
+anchors_preset = 8
 anchor_left = 0.5
+anchor_top = 0.5
 anchor_right = 0.5
+anchor_bottom = 0.5
 offset_left = -119.0
+offset_top = -164.0
 offset_right = 119.0
-offset_bottom = 53.0
+offset_bottom = -111.0
 grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 vertical_alignment = 1
 

@@ -35,6 +35,7 @@ public partial class ConnectWindow : Control
 
     void _on_connect_pressed()
     {
+        gui.errorLabel.Text = "";
         try
         {
             //gui.mpClient.StatusLabel.Text = "Connecting...";
@@ -48,16 +49,15 @@ public partial class ConnectWindow : Control
 
             if (ip == "localhost") { ip = "127.0.0.1"; }
 
-            gui.tcpClient.Connect(ip, port); // Note: dont use "localhost" for ip
-            if (!gui.tcpClient.isConnected)
+            if (gui.clientUDP.Connect(ip, port)) // Note: dont use "localhost" for ip cuz slow
             {
-                return;
+                gui.CloseWindows();
+                gui.LoginWindow.Visible = true;
             }
-            gui.CloseWindows();
-            gui.LoginWindow.Visible = true;
         }
         catch (Exception ex)
         {
+            gui.errorLabel.Text = "Connection failed";
             GD.Print(ex);
         }
     }

@@ -13,9 +13,9 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-public partial class TCPClient : Node
+public partial class ClientTCP : Node
 {
-    TcpClient client;
+    TcpClient tcpClient; // TCP client
 
     MeshInstance3D OnlineObject;
     Label StatusLabel;
@@ -26,6 +26,8 @@ public partial class TCPClient : Node
 
     //public Player localPlayer = new Player();
     PlayersManager playersManager;
+
+    DataProcessing dataProcessing = new DataProcessing(); // Object that deals with managing players and fixing received packets
 
 
 
@@ -42,8 +44,8 @@ public partial class TCPClient : Node
     {
         try
         {
-            client = new TcpClient(ip, port);
-            GD.Print("Connected successfully");
+            tcpClient = new TcpClient(ip, port);
+            GD.Print("Connected to TCP server successfully");
             StatusLabel.Text = "Connected, authentication in progress";
             isConnected = true;
 
@@ -54,6 +56,7 @@ public partial class TCPClient : Node
             StatusLabel.Text = "Failed to connect";
         }
     }
+
     public int Authentication(bool LoginOrRegister, string username, string password)
     {
         GD.Print("Authentication started");
@@ -61,9 +64,6 @@ public partial class TCPClient : Node
         string hashedPassword = passwordHasher.HashPassword(password + "secretxd");
 
         // Sends username / pass to server
-        NetworkStream authenticationStream = client.GetStream();
-
-
         LoginData loginData = new LoginData
         {
             lr = LoginOrRegister,
@@ -71,23 +71,28 @@ public partial class TCPClient : Node
             pw = hashedPassword
         };
 
-        string jsonData = JsonSerializer.Serialize(loginData, LoginDataContext.Default.LoginData);
+        NetworkStream authenticationStream = tcpClient.GetStream();
+        int receivedCode = 0;
+        try
+        {
+            string jsonData = JsonSerializer.Serialize(loginData, LoginDataContext.Default.LoginData);
+            byte[] messageByte = Encoding.ASCII.GetBytes($"#{jsonData.Length}#" + jsonData); // Adds the length to the beginning of message
+            authenticationStream.Write(messageByte, 0, messageByte.Length);
+            //authenticationStream.Close();
 
-        byte[] data = Encoding.ASCII.GetBytes(jsonData);
+            // Waits for reply
+            byte[] receivedBytes = new byte[1024];
+            int bytesRead;
 
-        authenticationStream.Write(data, 0, data.Length);
-        //authenticationStream.Close();
+            bytesRead = authenticationStream.Read(receivedBytes, 0, receivedBytes.Length);
+            string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
 
-        // Waits for reply
-        byte[] receivedBytes = new byte[1024];
-        int bytesRead;
-
-        bytesRead = authenticationStream.Read(receivedBytes, 0, receivedBytes.Length);
-
-        string receivedData = Encoding.UTF8.GetString(receivedBytes, 0, bytesRead);
-
-        int receivedCode = int.Parse(receivedData);
-
+            receivedCode = int.Parse(receivedData);
+        }
+        catch // Runs if there is no connection to the server
+        {
+            return -1;
+        }
 
         if (LoginOrRegister == true) // Runs if wanting to login
         {
@@ -128,31 +133,37 @@ public partial class TCPClient : Node
     {
         GD.Print("Authentication successful, waiting for server to send initial data");
         StatusLabel.Text = "Authentication successful, waiting for server to send initial data";
-        NetworkStream receivingInitStream = client.GetStream();
-        byte[] receivedBytes = new byte[1024];
-        int bytesRead;
-        bytesRead = receivingInitStream.Read(receivedBytes, 0, receivedBytes.Length);
-        string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
-        GD.Print(receivedData);
-        receivingInitStream.Flush();
 
-        Thread.Sleep(250); // Workaround so it wont mix up package with the new ones from ReceiveDataTCP
+        NetworkStream receivingInitStream = tcpClient.GetStream();
 
+        try
+        {
+            byte[] receivedBytes = new byte[1024];
+            int bytesRead = receivingInitStream.Read(receivedBytes, 0, receivedBytes.Length);
+            string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
+            receivingInitStream.Flush();
 
-        InitialData initialData = JsonSerializer.Deserialize(receivedData, InitialDataContext.Default.InitialData);
+            InitialData initialData = JsonSerializer.Deserialize(receivedData, InitialDataContext.Default.InitialData);
 
-        playersManager.PreSpawnPuppets(initialData.i, initialData.mp); // Sets the max amount of players the server can have and sets the index so the puppet of the local player wont be visible
+            playersManager.PreSpawnPuppets(initialData.i, initialData.mp); // Sets the max amount of players the server can have and sets the index so the puppet of the local player wont be visible
 
+            Task.Run(() => ReceiveDataTCP());
+            Task.Run(() => SendDataTCP());
 
-        Task.Run(() => ReceiveDataTCP());
-        Task.Run(() => SendDataTCP());
+            GD.Print("Connected");
+            StatusLabel.Text = "Connected";
+        }
+        catch (Exception ex)
+        {
+            GD.Print(ex);
+            return;
+        }
 
-        StatusLabel.Text = "Connected";
     }
 
     async Task ReceiveDataTCP()
     {
-        NetworkStream receivingStream = client.GetStream();
+        NetworkStream receivingStream = tcpClient.GetStream();
         while (true)
         {
             try
@@ -161,17 +172,15 @@ public partial class TCPClient : Node
                 int bytesRead;
 
                 bytesRead = await receivingStream.ReadAsync(receivedBytes, 0, receivedBytes.Length);
-
                 string receivedData = Encoding.ASCII.GetString(receivedBytes, 0, bytesRead);
 
                 playersManager.players = JsonSerializer.Deserialize(receivedData, PlayersContext.Default.Players);
-
                 playersManager.CallDeferred(nameof(playersManager.ProcessOtherPlayerPosition));
 
-                await receivingStream.FlushAsync();
+                //await receivingStream.FlushAsync();
                 //client.Close();
             }
-            catch (Exception ex)
+            catch
             {
                 GD.Print("Error receiving TCP packet");
                 //CallDeferred(nameof(LostConnection), ex.ToString());
@@ -181,7 +190,7 @@ public partial class TCPClient : Node
     }
     async Task SendDataTCP()
     {
-        NetworkStream sendingStream = client.GetStream();
+        NetworkStream sendingStream = tcpClient.GetStream();
         while (true)
         {
             try
@@ -189,11 +198,11 @@ public partial class TCPClient : Node
                 StreamReader reader = new StreamReader(sendingStream);
 
                 string jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerContext.Default.Player);
-                byte[] messageByte = Encoding.ASCII.GetBytes($"#{jsonData.Length}#" + jsonData);
+                byte[] messageByte = Encoding.ASCII.GetBytes($"#{jsonData.Length}#" + jsonData); // Adds the length to the beginning of message
                 await sendingStream.WriteAsync(messageByte, 0, messageByte.Length);
-                await sendingStream.FlushAsync();
+                //await sendingStream.FlushAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 GD.Print("Error sending TCP packet");
                 //CallDeferred(nameof(LostConnection), ex.ToString());

@@ -5,7 +5,6 @@ public partial class PlayersManager : Node3D
 {
     PackedScene playerScene = GD.Load<PackedScene>("res://Components/Player.tscn");
     PackedScene puppetPlayerScene = GD.Load<PackedScene>("res://Components/PuppetPlayer.tscn");
-    TCPClient tcpClient;
 
     CharacterBody3D playerCharacter; // Player character
     Node3D playerHead; // Player head
@@ -25,7 +24,7 @@ public partial class PlayersManager : Node3D
     public override void _Ready()
     {
         SetPhysicsProcess(false);
-        tcpClient = GetNode<TCPClient>("/root/Map/MultiplayerManager/TCPClient");
+        SetProcess(false);
         otherplayers = GetChild<Node3D>(1);
     }
     public void SpawnPlayer()
@@ -35,6 +34,7 @@ public partial class PlayersManager : Node3D
         GetChild(0).AddChild(playerCharacter);
         playerCharacter.Position = new Vector3(0f, 3f, 0f);
         SetPhysicsProcess(true);
+        SetProcess(true);
     }
     public void PreSpawnPuppets(int ownIndex, int maxPlayers)
     {
@@ -62,6 +62,11 @@ public partial class PlayersManager : Node3D
     public override void _PhysicsProcess(double delta)
     {
         PrepareLocalPlayerPositionForSending();
+
+    }
+    public override void _Process(double delta)
+    {
+        base._Process(delta);
         InterpolatePuppetPlayersPosition((float)delta);
     }
     void PrepareLocalPlayerPositionForSending()
