@@ -4,7 +4,6 @@ public partial class GUI : Control
 {
     [Signal] public delegate void PlayerControlsSignalEventHandler(bool input);
 
-    public ClientTCP clientTCP;
     public ClientUDP clientUDP;
 
     Control Windows;
@@ -18,7 +17,6 @@ public partial class GUI : Control
     public override void _Ready()
     {
         // init
-        clientTCP = GetNode<ClientTCP>("/root/Map/MultiplayerManager/ClientTCP");
         clientUDP = GetNode<ClientUDP>("/root/Map/MultiplayerManager/ClientUDP");
 
         Windows = GetChild<Control>(1);

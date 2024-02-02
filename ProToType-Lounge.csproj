@@ -5,17 +5,12 @@
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'ios' ">net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>ProToTypeLounge</RootNamespace>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <OutputType>Library</OutputType>
-    <PackAsTool>False</PackAsTool>
+	<!-- Use NativeAOT. -->
+	<PublishAot>false</PublishAot>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <IsAotCompatible>True</IsAotCompatible>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ExportDebug|AnyCPU'">
-    <IsAotCompatible>True</IsAotCompatible>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ExportRelease|AnyCPU'">
-    <IsAotCompatible>True</IsAotCompatible>
-  </PropertyGroup>
+  <ItemGroup>
+    <!-- Root the assemblies to avoid trimming. -->
+    <TrimmerRootAssembly Include="GodotSharp" />
+    <TrimmerRootAssembly Include="$(TargetName)" />
+  </ItemGroup>
 </Project>

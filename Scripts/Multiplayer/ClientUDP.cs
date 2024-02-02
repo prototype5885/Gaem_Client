@@ -20,14 +20,14 @@ public partial class ClientUDP : Node
 
     PlayersManager playersManager;
 
-    DataProcessing dataProcessing = new DataProcessing(); // Object that deals with managing players and fixing received packets
+    PacketProcessing packetProcessing = new PacketProcessing();// Object that deals with packets
 
 
 
     public override void _Ready()
     {
         // init
-        StatusLabel = GetParent().GetChild<Label>(2);
+        StatusLabel = GetParent().GetChild<Label>(1);
         playersManager = GetNode<PlayersManager>("/root/Map/PlayersManager");
         // end
         StatusLabel.Text = "Not connected to server";
@@ -51,7 +51,9 @@ public partial class ClientUDP : Node
             byte[] receivedBytes = udpClient.Receive(ref serverEndPoint);
             string message = Encoding.ASCII.GetString(receivedBytes);
 
-            if (message == "1")
+            int.TryParse(message, out int answer);
+
+            if (answer == 1)
             {
                 //isConnected = true;
                 GD.Print("Connection was successful");
@@ -59,7 +61,7 @@ public partial class ClientUDP : Node
             }
             else
             {
-                GD.Print("Connection failed, server is full");
+                GD.Print("Connection failed");
                 StatusLabel.Text = "Server is full";
                 return false;
             }
@@ -89,14 +91,11 @@ public partial class ClientUDP : Node
         int receivedCode = -1;
         try
         {
-            int commandType = 2; // Type 2 means user wants to login/register
             string jsonData = JsonSerializer.Serialize(loginData, LoginDataContext.Default.LoginData);
+            int commandType = 2; // Type 2 means user wants to login/register
             byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#{jsonData}");
             udpClient.Send(messageByte, messageByte.Length);
             GD.Print("Sent login data");
-
-
-
 
             // Waits for reply if login/register was successful
             IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Any, 0);
@@ -182,10 +181,26 @@ public partial class ClientUDP : Node
             try
             {
                 UdpReceiveResult udpReceiveResult = await udpClient.ReceiveAsync();
-                string receivedData = Encoding.ASCII.GetString(udpReceiveResult.Buffer);
-                //GD.Print(receivedData);
-                playersManager.players = JsonSerializer.Deserialize(receivedData, PlayersContext.Default.Players);
-                playersManager.CallDeferred(nameof(playersManager.ProcessOtherPlayerPosition));
+
+                Packet packet = packetProcessing.BreakUpPacket(udpReceiveResult.Buffer);
+
+                //GD.Print($"Received packet type: {packet.type}, data: {packet.data}");
+
+                switch (packet.type)
+                {
+                    case 0: // Server is pinging the client
+                        GD.Print("Server sent a ping");
+                        int commandType = 0; // Type 0 means client answers the server's ping
+                        byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#");
+                        await udpClient.SendAsync(messageByte, messageByte.Length);
+                        break;
+                    case 4: // Type 4 means server is sending position of other players
+                        playersManager.players = JsonSerializer.Deserialize(packet.data, PlayersContext.Default.Players);
+                        playersManager.CallDeferred(nameof(playersManager.ProcessOtherPlayerPosition));
+                        break;
+
+
+                }
             }
             catch
             {
