@@ -3,10 +3,9 @@ using System;
 
 public partial class LoginWindow : Control
 {
-    GUI gui;
-    LineEdit UsernameInput;
-    LineEdit PasswordInput;
-
+    private GUI gui;
+    private LineEdit UsernameInput;
+    private LineEdit PasswordInput;
 
     public override void _Ready()
     {
@@ -17,13 +16,44 @@ public partial class LoginWindow : Control
         PasswordInput = panel.GetChild<LineEdit>(1);
         // end
 
-        panel.GetChild<Button>(2).Pressed += () => _on_login_pressed();
-        panel.GetChild<Button>(3).Pressed += () => _on_register_pressed();
+        panel.GetChild<Button>(2).Pressed += () => OnLoginPressed();
+        panel.GetChild<Button>(3).Pressed += () => OnRegisterPressed();
+        panel.GetChild<Button>(4).Pressed += () => OnChangeServerPressed();
     }
-    void _on_login_pressed()
+    private void OnLoginPressed()
     {
-        int loginCode = gui.clientUDP.Authentication(true, UsernameInput.Text, PasswordInput.Text);
-        switch (loginCode)
+        try
+        {
+            //gui.mpClient.StatusLabel.Text = "Connecting...";
+
+            if (gui.ip == "localhost") { gui.ip = "127.0.0.1"; }
+
+            gui.clientUdp.serverAddress = gui.ip;
+            gui.clientUdp.serverPort = gui.port;
+
+            //if (gui.clientUDP.Connect(ip, port)) // Note: dont use "localhost" for ip cuz slow
+            //{
+            gui.CloseWindows();
+            gui.LoginWindow.Visible = true;
+            //}
+        }
+        catch (Exception ex)
+        {
+            gui.errorLabel.Text = "Connection failed";
+            GD.Print(ex);
+        }
+
+        string username = UsernameInput.Text;
+        string password = PasswordInput.Text;
+        //int loginCode = gui.clientUDP.Authentication(true, UsernameInput.Text, PasswordInput.Text); // Pressed the login button
+        gui.clientUdp.loginOrRegister = true;
+        gui.clientUdp.Connect(username, password);
+
+    }
+
+    public void LoginResult(int receivedCode)
+    {
+        switch (receivedCode)
         {
             case 1: // Login Successful
                 GD.Print("Login was successful");
@@ -35,15 +65,21 @@ public partial class LoginWindow : Control
                 gui.errorLabel.Text = "Wrong username or password.";
                 break;
             case -1:
-                GD.Print("Connection to the server has been lost.");
-                gui.BackToConnectWindow();
-                gui.errorLabel.Text = "Connection to the server has been lost.";
+                GD.Print("Failed to connect to the server.");
+                // gui.BackToConnectWindow();
+                gui.errorLabel.Text = "Failed to connect to the server.";
                 break;
         }
     }
-    void _on_register_pressed()
+    private void OnRegisterPressed()
     {
         gui.CloseWindows();
         gui.RegistrationWindow.Visible = true;
+    }
+
+    private void OnChangeServerPressed()
+    {
+        gui.CloseWindows();
+        gui.BackToConnectWindow();
     }
 }

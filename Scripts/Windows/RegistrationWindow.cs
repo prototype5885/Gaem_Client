@@ -1,13 +1,12 @@
 using Godot;
-using System;
 
 public partial class RegistrationWindow : Control
 {
-    GUI gui;
+    private GUI gui;
 
-    LineEdit UsernameInput;
-    LineEdit FirstPasswordInput;
-    LineEdit SecondPasswordInput;
+    private LineEdit UsernameInput;
+    private LineEdit FirstPasswordInput;
+    private LineEdit SecondPasswordInput;
 
     public override void _Ready()
     {
@@ -22,7 +21,7 @@ public partial class RegistrationWindow : Control
         panel.GetChild<Button>(3).Pressed += () => _on_register_pressed();
         panel.GetChild<Button>(4).Pressed += () => _on_back_pressed();
     }
-    void _on_register_pressed()
+    private void _on_register_pressed()
     {
         string username = UsernameInput.Text;
         string password = FirstPasswordInput.Text;
@@ -34,9 +33,13 @@ public partial class RegistrationWindow : Control
             return;
         }
 
-        int registerCode = gui.clientUDP.Authentication(false, username, password);
+        gui.clientUdp.loginOrRegister = false;
+        gui.clientUdp.Connect(username, password);
+    }
 
-        switch (registerCode)
+    public void RegistrationResult(int receivedCode)
+    {
+        switch (receivedCode)
         {
             case 1: // Login Successful
                 gui.CloseWindows();
@@ -54,7 +57,7 @@ public partial class RegistrationWindow : Control
                 break;
         }
     }
-    void _on_back_pressed()
+    private void _on_back_pressed()
     {
         gui.CloseWindows();
         gui.LoginWindow.Visible = true;

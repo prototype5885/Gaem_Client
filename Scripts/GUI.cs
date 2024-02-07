@@ -1,23 +1,27 @@
+using System;
 using Godot;
 
 public partial class GUI : Control
 {
     [Signal] public delegate void PlayerControlsSignalEventHandler(bool input);
 
-    public ClientUDP clientUDP;
+    public ClientUDP clientUdp;
 
-    Control Windows;
+    public Control Windows;
 
-    public Control ConnectWindow;
+    private Control ConnectWindow;
     public Control LoginWindow;
     public Control RegistrationWindow;
 
     public Label errorLabel;
 
+    public string ip = "";
+    public int port = 0;
+
     public override void _Ready()
     {
         // init
-        clientUDP = GetNode<ClientUDP>("/root/Map/MultiplayerManager/ClientUDP");
+        clientUdp = GetNode<ClientUDP>("/root/Map/MultiplayerManager/ClientUDP");
 
         Windows = GetChild<Control>(1);
 
@@ -31,8 +35,9 @@ public partial class GUI : Control
 
         CloseWindows();
 
-        ConnectWindow.Visible = true;
+        // ConnectWindow.Visible = true;
 
+        LoginWindow.Visible = true;
         PlayerControlsEnabled(false);
     }
     public void PlayerControlsEnabled(bool input)

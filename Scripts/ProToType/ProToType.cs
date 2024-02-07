@@ -2,7 +2,8 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Godot;
 
-public class ProToType
+namespace ProToType;
+public class ProToMath
 {
     // Linear interpolation function
     public static Vector3 ProToLerp(Vector3 start, Vector3 end, float t)
@@ -33,5 +34,13 @@ public class ProToType
         {
             return value;
         }
+    }
+    public static System.Numerics.Vector3 GodotVectorToSystemVector(Godot.Vector3 godotVector)
+    {
+        return new System.Numerics.Vector3(godotVector.X, godotVector.Y, godotVector.Z);
+    }
+    public static Godot.Vector3 SystemVectorToGodotVector(System.Numerics.Vector3 systemVector)
+    {
+        return new Godot.Vector3(systemVector.X, systemVector.Y, systemVector.Z);
     }
 }

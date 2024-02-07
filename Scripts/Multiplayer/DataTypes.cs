@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Numerics;
 
 public class LoginData
@@ -7,24 +8,24 @@ public class LoginData
     public string un { get; set; } // Username
     public string pw { get; set; } // Password
 }
-public class Player
+public class PlayerPosition
 {
     public float x { get; set; } // Player position X
     public float y { get; set; } // Player position Y
     public float z { get; set; } // Player position Z
 
     public float rx { get; set; } // Player head rotation X
-    public float ry { get; set; } // Player head rotation Y
-    public float rz { get; set; } // Player head rotation Z
+    public float ry { get; set; } // Player body rotation Y
+
 
     public override string ToString()
     {
-        return $"X:{x}, Y:{y}, Z:{z}, rX:{rx}, rY:{ry}, rZ:{rz}";
+        return $"{(int)x}, {(int)y}, {(int)z}";
     }
 }
-public class Players
+public class EveryPlayersPosition
 {
-    public Player[] list { get; set; }
+    public PlayerPosition[] positions { get; set; }
 }
 public class InitialData
 {

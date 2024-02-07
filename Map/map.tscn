@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
 [ext_resource type="Theme" uid="uid://b25nqr38ccaa0" path="res://Etc/HUD.tres" id="8_57x1o"]
 [ext_resource type="Script" path="res://Scripts/Player/Hud/Hud.cs" id="9_58umg"]
-[ext_resource type="Script" path="res://Scripts/Windows/ConnectWindow.cs" id="9_j43vl"]
+[ext_resource type="Script" path="res://Scripts/Windows/AddressWindow.cs" id="9_j43vl"]
 [ext_resource type="Script" path="res://Scripts/Windows/LoginWindow.cs" id="10_jojqg"]
 [ext_resource type="Script" path="res://Scripts/Windows/RegistrationWindow.cs" id="11_p3fko"]
 
@@ -203,7 +203,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ConnectWindow" type="Control" parent="GUI/JoinWindows"]
+[node name="AddressWindow" type="Control" parent="GUI/JoinWindows"]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -220,7 +220,7 @@ grow_vertical = 2
 theme = ExtResource("1_k5sxp")
 script = ExtResource("9_j43vl")
 
-[node name="Panel" type="Panel" parent="GUI/JoinWindows/ConnectWindow"]
+[node name="Panel" type="Panel" parent="GUI/JoinWindows/AddressWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -228,7 +228,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="IP" type="LineEdit" parent="GUI/JoinWindows/ConnectWindow/Panel"]
+[node name="IP" type="LineEdit" parent="GUI/JoinWindows/AddressWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -241,11 +241,11 @@ offset_right = 86.0
 offset_bottom = -42.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "prototype585.asuscomm.com"
+text = "127.0.0.1"
 placeholder_text = "IP Address"
 max_length = 32
 
-[node name="Port" type="LineEdit" parent="GUI/JoinWindows/ConnectWindow/Panel"]
+[node name="Port" type="LineEdit" parent="GUI/JoinWindows/AddressWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -262,7 +262,7 @@ text = "1943"
 placeholder_text = "Port"
 max_length = 16
 
-[node name="Connect" type="Button" parent="GUI/JoinWindows/ConnectWindow/Panel"]
+[node name="Set" type="Button" parent="GUI/JoinWindows/AddressWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -275,10 +275,9 @@ offset_right = 67.0
 offset_bottom = 64.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "Connect"
+text = "Accept address"
 
 [node name="LoginWindow" type="Control" parent="GUI/JoinWindows"]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -366,6 +365,18 @@ offset_bottom = 129.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Registration"
+
+[node name="ChangeServer" type="Button" parent="GUI/JoinWindows/LoginWindow/Panel"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 13.0
+offset_top = -67.0
+offset_right = 147.0
+offset_bottom = -13.0
+grow_vertical = 0
+text = "Change server"
 
 [node name="RegistrationWindow" type="Control" parent="GUI/JoinWindows"]
 visible = false
@@ -480,9 +491,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -119.0
-offset_top = -164.0
+offset_top = -180.0
 offset_right = 119.0
-offset_bottom = -111.0
+offset_bottom = -127.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)

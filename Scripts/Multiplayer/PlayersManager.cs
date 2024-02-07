@@ -1,4 +1,5 @@
 using Godot;
+using ProToType;
 
 
 public partial class PlayersManager : Node3D
@@ -11,9 +12,9 @@ public partial class PlayersManager : Node3D
 
     Node3D otherplayers; // Location of "other players" node
 
-    public Players players = new Players(); // Array of every players' position
+    public EveryPlayersPosition everyPlayersPosition = new EveryPlayersPosition(); // Array of every players' position
 
-    public Player localPlayer = new Player(); // Position of local player
+    public PlayerPosition localPlayer = new PlayerPosition(); // Position of local player
 
     public Vector3[] puppetPositions; // Position of puppet players
     public Vector3[] puppetRotations; // Rotation of puppet players
@@ -40,7 +41,7 @@ public partial class PlayersManager : Node3D
     {
         puppetPositions = new Vector3[maxPlayers]; // Initializes the vector3 array for puppet positions
         puppetRotations = new Vector3[maxPlayers]; // Initializes the vector3 array for puppet rotations
-        players.list = new Player[maxPlayers]; // Initializes the array containing players
+        everyPlayersPosition.positions = new PlayerPosition[maxPlayers]; // Initializes the array containing players
 
         for (int i = 0; i < maxPlayers; i++)
         {
@@ -53,11 +54,6 @@ public partial class PlayersManager : Node3D
                 otherplayers.GetChild<CharacterBody3D>(i).Visible = false;
             }
         }
-
-        System.Numerics.Vector3 sysvec = new System.Numerics.Vector3();
-        Godot.Vector3 godvec = new Godot.Vector3(5f, 6f, 4f);
-
-        sysvec.X = godvec.X;
     }
     public override void _PhysicsProcess(double delta)
     {
@@ -69,7 +65,7 @@ public partial class PlayersManager : Node3D
         base._Process(delta);
         InterpolatePuppetPlayersPosition((float)delta);
     }
-    void PrepareLocalPlayerPositionForSending()
+    private void PrepareLocalPlayerPositionForSending()
     {
         localPlayer.x = playerCharacter.Position.X;
         localPlayer.y = playerCharacter.Position.Y;
@@ -77,24 +73,27 @@ public partial class PlayersManager : Node3D
 
         localPlayer.rx = playerHead.Rotation.X;
         localPlayer.ry = playerCharacter.Rotation.Y;
-        localPlayer.rz = playerCharacter.Rotation.Z;
-
-        //GD.Print(playerCharacter.Rotation);
     }
-    void InterpolatePuppetPlayersPosition(float delta)
+    private void InterpolatePuppetPlayersPosition(float delta)
     {
         // Interpolation of puppet positions
+        // Vector3 puppetPosition; // Local position value of the puppet
+        // Vector3 puppetRotation; // Local rotation value of the puppet
+        // Vector3 puppetHeadRotation; // Local rotation value of the puppet head
+
+        CharacterBody3D puppet;
+        Node3D puppetHead;
 
         float speed = delta * 8;
         int playerCount = otherplayers.GetChildCount();
         for (int i = 0; i < playerCount; i++)
         {
-            CharacterBody3D puppet = otherplayers.GetChild<CharacterBody3D>(i);
-            Node3D puppetHead = puppet.GetChild<Node3D>(0);
+            puppet = otherplayers.GetChild<CharacterBody3D>(i);
+            puppetHead = puppet.GetChild<Node3D>(0);
 
-            Vector3 puppetPosition = puppet.Position; // Local position value of the puppet
-            Vector3 puppetRotation = puppet.Rotation; // Local rotation value of the puppet
-            Vector3 puppetHeadRotation = puppetHead.Rotation; // Local rotation value of the puppet head
+            Vector3 puppetPosition = puppet.Position;
+            Vector3 puppetRotation = puppet.Rotation;
+            Vector3 puppetHeadRotation = puppetHead.Rotation;
 
             if (interpolatePuppetPositions)
             {
@@ -126,17 +125,19 @@ public partial class PlayersManager : Node3D
     }
     public void ProcessOtherPlayerPosition()
     {
-        for (int i = 0; i < players.list.Length; i++)
+        for (int i = 0; i < everyPlayersPosition.positions.Length; i++)
         {
-
-            if (players.list[i] == null) // Runs if player is not found in given slot index
+            if (everyPlayersPosition.positions[i] == null) // Runs if player is not found in given slot index
             {
                 puppetPositions[i] = new Vector3(0f, -10f, 0f); // Resets puppet player position if not in use
             }
             else // Runs if player is found
             {
-                puppetPositions[i] = new Vector3(players.list[i].x, players.list[i].y, players.list[i].z); // Puts the updated position of puppet players in a vector3 array
-                puppetRotations[i] = new Vector3(players.list[i].rx, players.list[i].ry, players.list[i].rz); // Puts the updated rotation of puppet players in a vector3 array
+                // System.Console.WriteLine(playerPositionAll.positions[i].pos);
+
+                puppetPositions[i] = new Vector3(everyPlayersPosition.positions[i].x, everyPlayersPosition.positions[i].y, everyPlayersPosition.positions[i].z); // Puts the updated position of puppet players in a vector3 array
+                puppetRotations[i] = new Vector3(everyPlayersPosition.positions[i].rx, everyPlayersPosition.positions[i].ry, 0f); // Puts the updated rotation of puppet players in a vector3 array
+
             }
         }
     }
