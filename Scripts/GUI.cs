@@ -54,6 +54,7 @@ public partial class GUI : Control
     }
     public void CloseWindows()
     {
+        errorLabel.Text = string.Empty;
         foreach (Control window in Windows.GetChildren())
         {
             if (window != errorLabel)
@@ -67,4 +68,5 @@ public partial class GUI : Control
         CloseWindows();
         ConnectWindow.Visible = true;
     }
+
 }

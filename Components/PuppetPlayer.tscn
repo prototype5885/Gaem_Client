@@ -34,3 +34,11 @@ mesh = SubResource("CylinderMesh_3ehfc")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CylinderShape3D_uckwv")
 disabled = true
+
+[node name="Name" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.03449, 0)
+pixel_size = 0.002
+billboard = 1
+text = "ProToType"
+font_size = 128
+outline_size = 20

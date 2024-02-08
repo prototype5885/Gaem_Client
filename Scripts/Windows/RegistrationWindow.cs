@@ -18,10 +18,10 @@ public partial class RegistrationWindow : Control
         SecondPasswordInput = panel.GetChild<LineEdit>(2);
         // end
 
-        panel.GetChild<Button>(3).Pressed += () => _on_register_pressed();
-        panel.GetChild<Button>(4).Pressed += () => _on_back_pressed();
+        panel.GetChild<Button>(3).Pressed += () => OnRegisterPressed();
+        panel.GetChild<Button>(4).Pressed += () => OnBackPressed();
     }
-    private void _on_register_pressed()
+    private void OnRegisterPressed()
     {
         string username = UsernameInput.Text;
         string password = FirstPasswordInput.Text;
@@ -30,11 +30,22 @@ public partial class RegistrationWindow : Control
         if (password != secondPassword)
         {
             gui.errorLabel.Text = "Passwords don't match";
+            GD.Print("pw doesnt match");
+            return;
+        }
+        if (password.Length < 2)
+        {
+            gui.errorLabel.Text = "Password is too short, min 2 characters are required";
+            return;
+        }
+        if (username.Length < 2 || username.Length > 16)
+        {
+            gui.errorLabel.Text = "Username is either too short or too long, min 2 characters, max 16";
             return;
         }
 
         gui.clientUdp.loginOrRegister = false;
-        gui.clientUdp.Connect(username, password);
+        gui.clientUdp.Connect(gui.ip, gui.port, username, password);
     }
 
     public void RegistrationResult(int receivedCode)
@@ -45,19 +56,19 @@ public partial class RegistrationWindow : Control
                 gui.CloseWindows();
                 gui.PlayerControlsEnabled(true);
                 break;
-            case 2:
-                gui.errorLabel.Text = "Max 16 characters allowed for username";
+            case 5:
+                gui.errorLabel.Text = "Username is either too short or too long, min 2 characters, max 16   ";
                 break;
-            case 3:
+            case 6:
                 gui.errorLabel.Text = "Username is already taken.";
                 break;
             case -1:
                 gui.BackToConnectWindow();
-                gui.errorLabel.Text = "Connection to the server has been lost.";
+                gui.errorLabel.Text = "Failed to connect to the server.";
                 break;
         }
     }
-    private void _on_back_pressed()
+    private void OnBackPressed()
     {
         gui.CloseWindows();
         gui.LoginWindow.Visible = true;

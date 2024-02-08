@@ -20,7 +20,6 @@ public partial class AddressWindow : Control
         gui.ip = "127.0.0.1";
         gui.port = 1943;
     }
-
     private void _on_set_pressed()
     {
         if (!int.TryParse(InputPort.Text, out int port))

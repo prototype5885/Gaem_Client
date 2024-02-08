@@ -22,50 +22,49 @@ public partial class LoginWindow : Control
     }
     private void OnLoginPressed()
     {
-        try
-        {
-            //gui.mpClient.StatusLabel.Text = "Connecting...";
+        //try
+        //{
+        //    //gui.mpClient.StatusLabel.Text = "Connecting...";
 
-            if (gui.ip == "localhost") { gui.ip = "127.0.0.1"; }
+        //    if (gui.ip == "localhost") { gui.ip = "127.0.0.1"; }
 
-            gui.clientUdp.serverAddress = gui.ip;
-            gui.clientUdp.serverPort = gui.port;
 
-            //if (gui.clientUDP.Connect(ip, port)) // Note: dont use "localhost" for ip cuz slow
-            //{
-            gui.CloseWindows();
-            gui.LoginWindow.Visible = true;
-            //}
-        }
-        catch (Exception ex)
-        {
-            gui.errorLabel.Text = "Connection failed";
-            GD.Print(ex);
-        }
+        //    //if (gui.clientUDP.Connect(ip, port)) // Note: dont use "localhost" for ip cuz slow
+        //    //{
+        //    gui.CloseWindows();
+        //    gui.LoginWindow.Visible = true;
+        //    //}
+        //}
+        //catch (Exception ex)
+        //{
+        //    gui.errorLabel.Text = "Connection failed";
+        //    GD.Print(ex);
+        //}
 
         string username = UsernameInput.Text;
         string password = PasswordInput.Text;
-        //int loginCode = gui.clientUDP.Authentication(true, UsernameInput.Text, PasswordInput.Text); // Pressed the login button
+
         gui.clientUdp.loginOrRegister = true;
-        gui.clientUdp.Connect(username, password);
-
+        gui.clientUdp.Connect(gui.ip, gui.port, username, password);
     }
-
     public void LoginResult(int receivedCode)
     {
         switch (receivedCode)
         {
             case 1: // Login Successful
-                GD.Print("Login was successful");
                 gui.CloseWindows();
                 gui.PlayerControlsEnabled(true);
                 break;
             case 2:
-                GD.Print("Wrong username or password.");
                 gui.errorLabel.Text = "Wrong username or password.";
                 break;
+            case 3:
+                gui.errorLabel.Text = "No user was found with this name";
+                break;
+            case 4:
+                gui.errorLabel.Text = "This user is already logged in";
+                break;
             case -1:
-                GD.Print("Failed to connect to the server.");
                 // gui.BackToConnectWindow();
                 gui.errorLabel.Text = "Failed to connect to the server.";
                 break;

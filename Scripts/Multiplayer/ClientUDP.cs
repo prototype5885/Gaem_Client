@@ -22,8 +22,8 @@ public partial class ClientUDP : Node
 
     private static PacketProcessing packetProcessing = new PacketProcessing();// Object that deals with packet
 
-    public string serverAddress = string.Empty;
-    public int serverPort = 0;
+    //public string serverAddress = string.Empty;
+    //public int serverPort = 0;
 
     public bool loginOrRegister; // this is needed so when server sends back response about authentication, the authenticator will know
 
@@ -40,12 +40,14 @@ public partial class ClientUDP : Node
         StatusLabel.Text = "Not connected to server";
     }
 
-    public void Connect(string username, string password)
+    public void Connect(string serverAddress, int port, string username, string password)
     {
         try
         {
+            if (serverAddress == "localhost") { serverAddress = "127.0.0.1"; }
+
             udpClient = new UdpClient();
-            udpClient.Connect(serverAddress, serverPort);
+            udpClient.Connect(serverAddress, port);
 
             PasswordHasher passwordHasher = new PasswordHasher();
             string hashedPassword = passwordHasher.HashPassword(password + "secretxd");
@@ -57,12 +59,12 @@ public partial class ClientUDP : Node
                 un = username,
                 pw = hashedPassword
             };
-
             string jsonData = JsonSerializer.Serialize(loginData, LoginDataContext.Default.LoginData);
             int commandType = 1; // Type 1 means user wants to login/register
             byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#{jsonData}");
             udpClient.Send(messageByte, messageByte.Length);
             GD.Print("Sent login data to the server");
+
 
             Task.Run(() => ReceiveDataFromServer());
         }
