@@ -20,7 +20,7 @@ public partial class ClientUDP : Node
 
     private PlayersManager playersManager;
 
-    private static PacketProcessing packetProcessing = new PacketProcessing();// Object that deals with packet
+    private static readonly PacketProcessing packetProcessing = new PacketProcessing();// Object that deals with packet
 
     //public string serverAddress = string.Empty;
     //public int serverPort = 0;
@@ -104,7 +104,7 @@ public partial class ClientUDP : Node
 
                 Packet packet = packetProcessing.BreakUpPacket(udpReceiveResult.Buffer);
 
-                //GD.Print($"Received packet type: {packet.type}, data: {packet.data}");
+                // GD.Print($"Received packet type: {packet.type}, data: {packet.data}");
 
                 switch (packet.type)
                 {
@@ -140,6 +140,10 @@ public partial class ClientUDP : Node
                     case 3: // Type 3 means server is sending position of other players
                         playersManager.everyPlayersPosition = JsonSerializer.Deserialize(packet.data, EveryPlayersPositionContext.Default.EveryPlayersPosition);
                         playersManager.CallDeferred(nameof(playersManager.ProcessOtherPlayerPosition));
+                        break;
+                    case 4:
+                        EveryPlayersName everyPlayersName = JsonSerializer.Deserialize(packet.data, EveryPlayersNameContext.Default.EveryPlayersName);
+                        GD.Print(packet.data);
                         break;
                 }
             }

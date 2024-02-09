@@ -62,6 +62,7 @@ public partial class Movement : CharacterBody3D
                 if (Input.IsActionJustPressed("sprint"))
                 {
                     sprint_speed_multiplier = 1.5f;
+                    Engine.MaxFps = 5;
                     change_speed();
                 }
                 if (Input.IsActionJustReleased("sprint"))

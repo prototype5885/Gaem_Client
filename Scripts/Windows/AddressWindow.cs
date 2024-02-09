@@ -15,12 +15,11 @@ public partial class AddressWindow : Control
         InputPort = panel.GetChild<LineEdit>(1);
         // end
 
-        panel.GetChild<Button>(2).Pressed += () => _on_set_pressed();
+        panel.GetChild<Button>(2).Pressed += () => OnSetPressed();
 
-        gui.ip = "127.0.0.1";
-        gui.port = 1943;
+        SetAddress();
     }
-    private void _on_set_pressed()
+    private void SetAddress()
     {
         if (!int.TryParse(InputPort.Text, out int port))
         {
@@ -31,6 +30,10 @@ public partial class AddressWindow : Control
 
         gui.ip = ip;
         gui.port = port;
+    }
+    private void OnSetPressed()
+    {
+        SetAddress();
 
         gui.CloseWindows();
         gui.LoginWindow.Visible = true;

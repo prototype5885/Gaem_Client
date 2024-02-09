@@ -21,6 +21,7 @@ public partial class PlayersManager : Node3D
 
 
     public bool interpolatePuppetPositions = false;
+    public float interpolationSpeed = 8f;
 
     public override void _Ready()
     {
@@ -55,15 +56,11 @@ public partial class PlayersManager : Node3D
             }
         }
     }
-    public override void _PhysicsProcess(double delta)
-    {
-        PrepareLocalPlayerPositionForSending();
-
-    }
     public override void _Process(double delta)
     {
         base._Process(delta);
         InterpolatePuppetPlayersPosition((float)delta);
+        PrepareLocalPlayerPositionForSending();
     }
     private void PrepareLocalPlayerPositionForSending()
     {
@@ -84,7 +81,7 @@ public partial class PlayersManager : Node3D
         CharacterBody3D puppet;
         Node3D puppetHead;
 
-        float speed = delta * 8;
+        float speed = delta * interpolationSpeed;
         int playerCount = otherplayers.GetChildCount();
         for (int i = 0; i < playerCount; i++)
         {
@@ -140,6 +137,10 @@ public partial class PlayersManager : Node3D
 
             }
         }
+    }
+    public void ProcessOtherPlayerName()
+    {
+
     }
 }
 
