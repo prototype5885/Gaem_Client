@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -41,7 +42,6 @@ public class PacketProcessing
         string rawPacketString = Encoding.ASCII.GetString(receivedBytes, 0, receivedBytes.Length);
 
         Packet packet = new Packet();
-
 
         string packetLengthPattern = @"#(.*)#";
         Match match = Regex.Match(rawPacketString, packetLengthPattern);

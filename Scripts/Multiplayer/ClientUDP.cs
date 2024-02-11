@@ -60,7 +60,7 @@ public partial class ClientUDP : Node
                 pw = hashedPassword
             };
             string jsonData = JsonSerializer.Serialize(loginData, LoginDataContext.Default.LoginData);
-            int commandType = 1; // Type 1 means user wants to login/register
+            byte commandType = 1; // Type 1 means user wants to login/register
             byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#{jsonData}");
             udpClient.Send(messageByte, messageByte.Length);
             GD.Print("Sent login data to the server");
@@ -104,14 +104,14 @@ public partial class ClientUDP : Node
 
                 Packet packet = packetProcessing.BreakUpPacket(udpReceiveResult.Buffer);
 
-                // GD.Print($"Received packet type: {packet.type}, data: {packet.data}");
+                //GD.Print($"Received packet type: {packet.type}, data: {packet.data}");
 
                 switch (packet.type)
                 {
                     case 0: // Server is pinging the client
                         GD.Print("Server sent a ping");
                         CallDeferred(nameof(PingReceived));
-                        int commandType = 0; // Type 0 means client answers the server's ping
+                        byte commandType = 0; // Type 0 means client answers the server's ping
                         byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#");
                         await udpClient.SendAsync(messageByte, messageByte.Length);
                         break;
@@ -143,7 +143,6 @@ public partial class ClientUDP : Node
                         break;
                     case 4:
                         EveryPlayersName everyPlayersName = JsonSerializer.Deserialize(packet.data, EveryPlayersNameContext.Default.EveryPlayersName);
-                        GD.Print(packet.data);
                         break;
                 }
             }
@@ -160,7 +159,7 @@ public partial class ClientUDP : Node
             try
             {
                 string jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerPositionContext.Default.PlayerPosition);
-                int commandType = 3; // Type 3 means client wants to send its position to the server
+                byte commandType = 3; // Type 3 means client wants to send its position to the server
                 // GD.Print(jsonData);
                 byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#{jsonData}");
                 await udpClient.SendAsync(messageByte, messageByte.Length);
