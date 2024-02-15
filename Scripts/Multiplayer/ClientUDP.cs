@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 public partial class ClientUDP : Node
 {
@@ -29,6 +30,9 @@ public partial class ClientUDP : Node
 
     private GUI gui;
 
+    private static System.Timers.Timer timeoutTimer = new System.Timers.Timer(1000);
+
+    byte connectionStatus = 0;
 
     public override void _Ready()
     {
@@ -37,7 +41,12 @@ public partial class ClientUDP : Node
         playersManager = GetNode<PlayersManager>("/root/Map/PlayersManager");
         gui = GetNode<GUI>("/root/Map/GUI");
         // end
-        StatusLabel.Text = "Not connected to server";
+        SetConnectionStatusText(0); // sets status text to not connected
+
+        // set up timer
+        timeoutTimer.Elapsed += ServerTimedOutEvent;
+        timeoutTimer.Enabled = true;
+        // end set up timer
 
     }
 
@@ -52,7 +61,7 @@ public partial class ClientUDP : Node
 
             packetProcessing.socket = socket;
 
-            string hashedPassword = string.Empty;
+            string hashedPassword = "";
             using (var passwordHasher = new PasswordHasher())
             {
                 hashedPassword = passwordHasher.HashPassword(password + "secretxd");
@@ -80,8 +89,8 @@ public partial class ClientUDP : Node
 
     private void AuthenticationSuccessful(int clientIndex, int maxPlayers)
     {
-        GD.Print("Authentication successful, waiting for server to send initial data");
-        StatusLabel.Text = "Authentication successful, waiting for server to send initial data";
+        // GD.Print("Authentication successful, waiting for server to send initial data");
+        // StatusLabel.Text = "Authentication successful, waiting for server to send initial data";
 
         playersManager.SpawnPlayer();
         playersManager.PreSpawnPuppets(clientIndex, maxPlayers); // Sets the max amount of players the server can have and sets the index so the puppet of the local player wont be visible
@@ -89,7 +98,7 @@ public partial class ClientUDP : Node
         Task.Run(() => SendPositionToServer());
 
         GD.Print("Initial data received, connected");
-        StatusLabel.Text = "Connected";
+        SetConnectionStatusText(1);
     }
     private async Task ReceiveDataFromServer()
     {
@@ -110,7 +119,8 @@ public partial class ClientUDP : Node
                     // Server is pinging the client
                     case 0:
                         GD.Print("Server sent a ping");
-                        CallDeferred(nameof(PingReceived));
+                        ResetTimeoutTimer();
+                        if (connectionStatus != 1) CallDeferred(nameof(SetConnectionStatusText), 1); // sets connection status text to connected, if its not already
                         await packetProcessing.SendUnreliable(0, "", null);
                         break;
                     // Type 1 means server is responding to login/registering
@@ -177,8 +187,31 @@ public partial class ClientUDP : Node
             Thread.Sleep(10);
         }
     }
-    private void PingReceived()
+    private void ServerTimedOutEvent(Object source, ElapsedEventArgs e)
     {
-        StatusLabel.Text = "Connected";
+        GD.Print("timeout");
+        // SetConnectionStatusText(2);
+    }
+    private void ResetTimeoutTimer()
+    {
+        timeoutTimer.Stop();
+        timeoutTimer.Interval = 1000;
+        timeoutTimer.Start();
+    }
+    private void SetConnectionStatusText(byte newStatus)
+    {
+        connectionStatus = newStatus;
+        switch (newStatus)
+        {
+            case 0:
+                StatusLabel.Text = "Not connected";
+                break;
+            case 1:
+                StatusLabel.Text = "Connected";
+                break;
+            case 2:
+                StatusLabel.Text = "Timing out";
+                break;
+        }
     }
 }
