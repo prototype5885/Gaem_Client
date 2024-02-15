@@ -20,7 +20,7 @@ public partial class ClientUDP : Node
 
     private PlayersManager playersManager;
 
-    private PacketProcessing packetProcessing; // Object that deals with packet
+    private static readonly PacketProcessing packetProcessing = new PacketProcessing(); // Object that deals with packet
 
     //public string serverAddress = string.Empty;
     //public int serverPort = 0;
@@ -50,9 +50,13 @@ public partial class ClientUDP : Node
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Connect(serverAddress, port);
 
-            packetProcessing = new PacketProcessing(socket);
-            PasswordHasher passwordHasher = new PasswordHasher();
-            string hashedPassword = passwordHasher.HashPassword(password + "secretxd");
+            packetProcessing.socket = socket;
+
+            string hashedPassword = string.Empty;
+            using (var passwordHasher = new PasswordHasher())
+            {
+                hashedPassword = passwordHasher.HashPassword(password + "secretxd");
+            }
 
             // Sends username / pass to server
             LoginData loginData = new LoginData
@@ -62,13 +66,11 @@ public partial class ClientUDP : Node
                 pw = hashedPassword
             };
             string jsonData = JsonSerializer.Serialize(loginData, LoginDataContext.Default.LoginData);
-            await packetProcessing.SendReliable(1, jsonData, null);
-            Task.Run(() => packetProcessing.SendReliable(1, jsonData, null));
+            await packetProcessing.SendUnreliable(1, jsonData, null);
 
             GD.Print("Sent login data to the server");
 
-
-            await ReceiveDataFromServer();
+            await ReceiveDataFromServer(); // starts receiving data from the server, this will stay on for as long as the client is connected to the server
         }
         catch // Runs if there is no connection to the server
         {
@@ -113,9 +115,13 @@ public partial class ClientUDP : Node
                         break;
                     // Type 1 means server is responding to login/registering
                     case 1:
+                        InitialData initialData = JsonSerializer.Deserialize(packet.data, InitialDataContext.Default.InitialData);
+                        if (initialData.lr == 1)
+                        {
+                            CallDeferred(nameof(AuthenticationSuccessful), initialData.i, initialData.mp);
+                        }
                         GD.Print("Server responded to login");
-                        int.TryParse(packet.data, out int receivedCode);
-
+                        //int.TryParse(packet.data, out int receivedCode);
                         // LoginWindow loginWindow = GetNode<LoginWindow>("/root/Map/GUI/JoinWindows/LoginWindow");
                         // RegistrationWindow registrationWindow = GetNode<RegistrationWindow>("/root/Map/GUI/JoinWindows/RegistrationWindow");
                         LoginWindow loginWindow = gui.LoginWindow as LoginWindow;
@@ -123,17 +129,16 @@ public partial class ClientUDP : Node
 
                         if (loginOrRegister == true) // Runs if wanting to login
                         {
-                            loginWindow.CallDeferred(nameof(loginWindow.LoginResult), receivedCode);
+                            loginWindow.CallDeferred(nameof(loginWindow.LoginResult), initialData.lr);
                         }
                         else // Runs if wanting to register
                         {
-                            registrationWindow.CallDeferred(nameof(registrationWindow.RegistrationResult), receivedCode);
+                            registrationWindow.CallDeferred(nameof(registrationWindow.RegistrationResult), initialData.lr);
                         }
                         break;
                     // Type 2 means server is sending the initial data to the client
                     case 2:
-                        InitialData initialData = JsonSerializer.Deserialize(packet.data, InitialDataContext.Default.InitialData);
-                        CallDeferred(nameof(AuthenticationSuccessful), initialData.i, initialData.mp);
+
                         break;
                     // Type 3 means server is sending position of other players
                     case 3:

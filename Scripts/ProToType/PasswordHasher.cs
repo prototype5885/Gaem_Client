@@ -2,8 +2,10 @@
 using System.Security.Cryptography;
 using System;
 
-public class PasswordHasher
+public class PasswordHasher : IDisposable
 {
+    private bool disposed = false;
+
     public string HashPassword(string password)
     {
         using (SHA256 sha256 = SHA256.Create())
@@ -13,6 +15,26 @@ public class PasswordHasher
 
             // Convert the byte array to a hexadecimal string
             return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+        }
+    }
+    // Implement IDisposable
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            if (disposing)
+            {
+                // Clean up managed resources
+            }
+
+
+            disposed = true;
         }
     }
 }

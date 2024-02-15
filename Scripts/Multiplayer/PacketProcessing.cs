@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -11,14 +12,9 @@ using System.Threading.Tasks;
 
 public class PacketProcessing
 {
-    private Socket socket;
+    public Socket socket;
 
     private List<string> sentPackets = new List<string>();
-
-    public PacketProcessing(Socket socket)
-    {
-        this.socket = socket;
-    }
 
     public async Task SendUnreliable(byte commandType, string message, EndPoint address)
     {
