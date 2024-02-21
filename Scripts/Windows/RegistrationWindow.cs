@@ -44,8 +44,8 @@ public partial class RegistrationWindow : Control
             return;
         }
 
-        gui.clientUdp.loginOrRegister = false;
-        gui.clientUdp.Connect(gui.ip, gui.port, username, password);
+        gui.client.loginOrRegister = false;
+        gui.client.Connect(gui.ip, gui.port, username, password);
     }
 
     public void RegistrationResult(int receivedCode)

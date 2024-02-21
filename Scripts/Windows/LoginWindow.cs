@@ -44,8 +44,8 @@ public partial class LoginWindow : Control
         string username = UsernameInput.Text;
         string password = PasswordInput.Text;
 
-        gui.clientUdp.loginOrRegister = true;
-        gui.clientUdp.Connect(gui.ip, gui.port, username, password);
+        gui.client.loginOrRegister = true;
+        gui.client.Connect(gui.ip, gui.port, username, password);
     }
     public void LoginResult(int receivedCode)
     {

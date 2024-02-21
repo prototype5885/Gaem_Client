@@ -14,7 +14,7 @@ public partial class Chat : Panel
 
     GUI GUI;
 
-    ClientUDP clientUDP;
+    Client client;
 
     public override void _Ready()
     {
@@ -27,8 +27,7 @@ public partial class Chat : Panel
         messages = messagesMargin.GetChild<VBoxContainer>(0);
         spamTimer = GetNode<Timer>("%SpamTimer");
         GUI = GetParent<GUI>();
-        //clientTCP = GetNode<ClientTCP>("/root/Map/MultiplayerManager/ClientTCP");
-        clientUDP = GetNode<ClientUDP>("/root/Map/MultiplayerManager/ClientUDP");
+        client = GetNode<Client>("/root/Map/MultiplayerManager/Client");
         // end
 
         //inputChat.Visible = false;
