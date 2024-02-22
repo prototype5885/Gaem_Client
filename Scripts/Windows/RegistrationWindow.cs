@@ -48,25 +48,26 @@ public partial class RegistrationWindow : Control
         gui.client.Connect(gui.ip, gui.port, username, password);
     }
 
-    public void RegistrationResult(int receivedCode)
+    public bool RegistrationResult(int receivedCode)
     {
         switch (receivedCode)
         {
             case 1: // Login Successful
-                gui.CloseWindows();
-                gui.PlayerControlsEnabled(true);
-                break;
+                gui.CallDeferred(nameof(gui.CloseWindows));
+                gui.CallDeferred(nameof(gui.PlayerControlsEnabled), true);
+                return true;
             case 5:
                 gui.errorLabel.Text = "Username is either too short or too long, min 2 characters, max 16   ";
-                break;
+                return false;
             case 6:
                 gui.errorLabel.Text = "Username is already taken.";
-                break;
+                return false;
             case -1:
                 gui.BackToConnectWindow();
                 gui.errorLabel.Text = "Failed to connect to the server.";
-                break;
+                return false;
         }
+        return false;
     }
     private void OnBackPressed()
     {

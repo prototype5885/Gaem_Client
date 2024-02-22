@@ -110,7 +110,7 @@ public partial class Client : Node
             {
                 byte[] buffer = new byte[8192];
                 int receivedBytes = await serverStream.ReadAsync(buffer, 0, buffer.Length);
-                BreakUpPacket(buffer, receivedBytes);
+                ProcessBuffer(buffer, receivedBytes);
             }
             catch
             {
@@ -124,6 +124,7 @@ public partial class Client : Node
         {
             try
             {
+                Thread.Sleep(100);
                 string jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerPositionContext.Default.PlayerPosition);
                 await Send(3, jsonData, serverStream);
             }
@@ -131,7 +132,7 @@ public partial class Client : Node
             {
                 // GD.Print("Error sending UDP packet");
             }
-            Thread.Sleep(100);
+
         }
     }
     private void ServerTimedOutEvent(Object source, ElapsedEventArgs e)
@@ -164,7 +165,7 @@ public partial class Client : Node
     {
         try
         {
-            byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#{message}");
+            byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#${message}$");
 
             await stream.WriteAsync(messageByte);
         }
@@ -173,9 +174,10 @@ public partial class Client : Node
             // Console.WriteLine($"Error sending message type {commandType}. Exception: {ex.Message}");
         }
     }
-    private async void BreakUpPacket(byte[] receivedBytes, int byteLength)
+    private async void ProcessBuffer(byte[] receivedBytes, int byteLength)
     {
         string packetString = Encoding.ASCII.GetString(receivedBytes, 0, byteLength);
+
 
         string packetTypePattern = @"#(.*)#";
         string packetDataPattern = @"\$(.*?)\$";
@@ -183,36 +185,19 @@ public partial class Client : Node
         MatchCollection packetTypeMatches = Regex.Matches(packetString, packetTypePattern);
         MatchCollection packetDataMatches = Regex.Matches(packetString, packetDataPattern);
 
-        List<Packet> packets = new List<Packet>();
         for (int i = 0; i < packetTypeMatches.Count; i++)
         {
             int.TryParse(packetTypeMatches[i].Groups[1].Value, out int typeOfPacket);
 
             Packet packet = new Packet();
             packet.type = typeOfPacket;
-
-            // GD.Print(packet.type);
-
             packet.data = packetDataMatches[i].Groups[1].Value;
-            // GD.Print("Processed:" + packet.data);
 
-            packets.Add(packet);
-
-
+            await ProcessDataSentByServer(packet);
         }
 
-        // if (packets.Count > 1)
-        // {
-        //     GD.Print("Multiple");
-        // }
-
-        foreach (Packet packet in packets)
-        {
-            await ProcessPackets(packet);
-
-        }
     }
-    private async Task ProcessPackets(Packet packet)
+    private async Task ProcessDataSentByServer(Packet packet)
     {
         try
         {
@@ -225,32 +210,50 @@ public partial class Client : Node
                     if (connectionStatus != 1) CallDeferred(nameof(SetConnectionStatusText), 1); // sets connection status text to connected, if its not already
                     await Send(0, "", serverStream);
                     break;
+
                 // Type 1 means server is responding to login/registering
                 case 1:
                     InitialData initialData = JsonSerializer.Deserialize(packet.data, InitialDataContext.Default.InitialData);
+
                     if (initialData.lr == 1)
                     {
                         CallDeferred(nameof(AuthenticationSuccessful), initialData.i, initialData.mp);
                     }
+
                     GD.Print("Server responded to login");
                     LoginWindow loginWindow = gui.LoginWindow as LoginWindow;
                     RegistrationWindow registrationWindow = gui.RegistrationWindow as RegistrationWindow;
 
+                    bool result = false;
                     if (loginOrRegister == true) // Runs if wanting to login
                     {
-                        loginWindow.CallDeferred(nameof(loginWindow.LoginResult), initialData.lr);
+                        result = loginWindow.LoginResult(initialData.lr);
                     }
                     else // Runs if wanting to register
                     {
-                        registrationWindow.CallDeferred(nameof(registrationWindow.RegistrationResult), initialData.lr);
+                        registrationWindow.RegistrationResult(initialData.lr);
                     }
-                    break;
-                // Type 2 means server is sending the initial data to the client
-                case 2:
 
+                    if (result == true)
+                    {
+                        initialDataReceived = true;
+                    }
+                    // else
+                    // {
+
+                    //     initialDataReceived = false;
+                    //     serverStream.Close();
+                    //     serverConnection = null;
+                    // }
                     break;
+
+                case 2:
+                    break;
+
                 // Type 3 means server is sending position of other players
                 case 3:
+                    if (!initialDataReceived) break;
+
                     playersManager.everyPlayersPosition = JsonSerializer.Deserialize(packet.data, EveryPlayersPositionContext.Default.EveryPlayersPosition);
                     playersManager.CallDeferred(nameof(playersManager.ProcessOtherPlayerPosition));
                     break;

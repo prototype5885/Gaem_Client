@@ -47,28 +47,30 @@ public partial class LoginWindow : Control
         gui.client.loginOrRegister = true;
         gui.client.Connect(gui.ip, gui.port, username, password);
     }
-    public void LoginResult(int receivedCode)
+    public bool LoginResult(int receivedCode)
     {
         switch (receivedCode)
         {
             case 1: // Login Successful
                 gui.CloseWindows();
-                gui.PlayerControlsEnabled(true);
-                break;
+                gui.CallDeferred(nameof(gui.CloseWindows));
+                gui.CallDeferred(nameof(gui.PlayerControlsEnabled), true);
+                return true;
             case 2:
                 gui.errorLabel.Text = "Wrong username or password.";
-                break;
+                return false;
             case 3:
                 gui.errorLabel.Text = "No user was found with this name";
-                break;
+                return false;
             case 4:
                 gui.errorLabel.Text = "This user is already logged in";
-                break;
+                return false;
             case -1:
                 // gui.BackToConnectWindow();
                 gui.errorLabel.Text = "Failed to connect to the server.";
-                break;
+                return false;
         }
+        return false;
     }
     private void OnRegisterPressed()
     {
