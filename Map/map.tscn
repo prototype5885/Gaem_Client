@@ -241,7 +241,7 @@ offset_right = 86.0
 offset_bottom = -42.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "127.0.0.1"
+text = "188.36.70.96"
 placeholder_text = "IP Address"
 max_length = 32
 
@@ -258,7 +258,7 @@ offset_right = 242.0
 offset_bottom = -42.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "1943"
+text = "1942"
 placeholder_text = "Port"
 max_length = 16
 

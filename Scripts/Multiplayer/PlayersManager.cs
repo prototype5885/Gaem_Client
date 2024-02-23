@@ -20,7 +20,7 @@ public partial class PlayersManager : Node3D
     public Vector3[] puppetRotations; // Rotation of puppet players
 
 
-    public bool interpolatePuppetPositions = true;
+    public bool interpolatePuppetPositions = false;
     public float interpolationSpeed = 4f;
 
     public override void _Ready()

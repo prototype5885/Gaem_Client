@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 
 // using System.Reflection.Metadata.Ecma335;
@@ -14,8 +15,14 @@ using System.Timers;
 
 public partial class Client : Node
 {
+    // tcp stuff
     private TcpClient serverConnection;
     private NetworkStream serverStream;
+    private IPEndPoint serverTcpEndpoint;
+
+    // udp stuff
+    private Socket clientUdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+    //private EndPoint serverUdpEndpoint;
 
     private Label StatusLabel;
 
@@ -36,6 +43,8 @@ public partial class Client : Node
     byte connectionStatus = 0;
 
     bool initialDataReceived = false;
+
+    int tickrate = 10;
 
     public override void _Ready()
     {
@@ -59,8 +68,13 @@ public partial class Client : Node
         {
             if (serverAddress == "localhost") { serverAddress = "127.0.0.1"; }
 
-            serverConnection = new TcpClient(serverAddress, port);
+            serverConnection = new TcpClient(serverAddress, port); // connects to tcp server
             serverStream = serverConnection.GetStream();
+
+            serverTcpEndpoint = (IPEndPoint)serverConnection.Client.RemoteEndPoint;
+
+            clientUdpSocket.Connect(IPAddress.Parse(serverAddress), port + 1); // connects to udp server
+            //IPEndPoint localUdpEndpoint = (IPEndPoint)clientUdpSocket.LocalEndPoint;
 
             string hashedPassword = "";
             using (var passwordHasher = new PasswordHasher())
@@ -71,20 +85,22 @@ public partial class Client : Node
             // Sends username / pass to server
             LoginData loginData = new LoginData
             {
-                lr = loginOrRegister,
-                un = username,
-                pw = hashedPassword
+                loginOrRegister = loginOrRegister,
+                username = username,
+                password = hashedPassword,
+                //udpPort = localUdpEndpoint.Port
             };
             string jsonData = JsonSerializer.Serialize(loginData, LoginDataContext.Default.LoginData);
-            await Send(1, jsonData, serverStream);
+            await Send(1, jsonData, true);
 
             GD.Print("Sent login data to the server");
 
-            await ReceiveDataFromServer(); // starts receiving data from the server, this will stay on for as long as the client is connected to the server
+            await ReceiveTcpDataFromServer(); // starts receiving data from the server, this will stay on for as long as the client is connected to the server
         }
-        catch // Runs if there is no connection to the server
+        catch (Exception ex) // Runs if there is no connection to the server
         {
-            GD.Print("Failed to connect");
+            GD.Print(ex);
+            //GD.Print("Failed to connect");
         }
     }
 
@@ -97,11 +113,12 @@ public partial class Client : Node
         playersManager.PreSpawnPuppets(clientIndex, maxPlayers); // Sets the max amount of players the server can have and sets the index so the puppet of the local player wont be visible
 
         Task.Run(() => SendPositionToServer());
+        Task.Run(() => ReceiveUdpDataFromServer());
 
         GD.Print("Initial data received, connected");
         SetConnectionStatusText(1);
     }
-    private async Task ReceiveDataFromServer()
+    private async Task ReceiveTcpDataFromServer()
     {
 
         while (true)
@@ -110,6 +127,7 @@ public partial class Client : Node
             {
                 byte[] buffer = new byte[8192];
                 int receivedBytes = await serverStream.ReadAsync(buffer, 0, buffer.Length);
+                //GD.Print(receivedBytes);
                 ProcessBuffer(buffer, receivedBytes);
             }
             catch
@@ -118,15 +136,37 @@ public partial class Client : Node
             }
         }
     }
+    private async Task ReceiveUdpDataFromServer()
+    {
+        try
+        {
+            while (true)
+            {
+                byte[] buffer = new byte[4096];
+
+                int receivedBytes = await clientUdpSocket.ReceiveAsync(buffer, SocketFlags.None);
+
+                GD.Print("receivedudp");
+
+
+                ProcessBuffer(buffer, receivedBytes);
+
+            }
+        }
+        catch
+        {
+
+        }
+    }
     private async Task SendPositionToServer()
     {
         while (true)
         {
             try
             {
-                Thread.Sleep(100);
+                Thread.Sleep(tickrate);
                 string jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerPositionContext.Default.PlayerPosition);
-                await Send(3, jsonData, serverStream);
+                await Send(3, jsonData, false);
             }
             catch
             {
@@ -161,15 +201,22 @@ public partial class Client : Node
                 break;
         }
     }
-    private async Task Send(byte commandType, string message, NetworkStream stream)
+    private async Task Send(byte commandType, string message, bool reliable)
     {
         try
         {
             byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#${message}$");
 
-            await stream.WriteAsync(messageByte);
+            if (reliable)
+            {
+                await serverStream.WriteAsync(messageByte);
+            }
+            else
+            {
+                await clientUdpSocket.SendAsync(messageByte, SocketFlags.None);
+            }
         }
-        catch (Exception ex)
+        catch
         {
             // Console.WriteLine($"Error sending message type {commandType}. Exception: {ex.Message}");
         }
@@ -208,7 +255,7 @@ public partial class Client : Node
                     // GD.Print("Server sent a ping");
                     ResetTimeoutTimer();
                     if (connectionStatus != 1) CallDeferred(nameof(SetConnectionStatusText), 1); // sets connection status text to connected, if its not already
-                    await Send(0, "", serverStream);
+                    await Send(0, "", false);
                     break;
 
                 // Type 1 means server is responding to login/registering
