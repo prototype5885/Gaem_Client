@@ -15,35 +15,15 @@ using System.Timers;
 
 public partial class Client : Node
 {
-    // tcp stuff
-    private TcpClient serverConnection;
-    private NetworkStream serverStream;
-    private IPEndPoint serverTcpEndpoint;
+    readonly Socket clientTcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+    readonly Socket clientUdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
-    // udp stuff
-    private Socket clientUdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-    //private EndPoint serverUdpEndpoint;
-
-    private Label StatusLabel;
-
-    //public bool isConnected = false;
-
-    private PlayersManager playersManager;
-
-
-    //public string serverAddress = string.Empty;
-    //public int serverPort = 0;
-
+    Label StatusLabel;
+    PlayersManager playersManager;
     public bool loginOrRegister; // this is needed so when server sends back response about authentication, the authenticator will know
-
-    private GUI gui;
-
-    private static System.Timers.Timer timeoutTimer = new System.Timers.Timer(1000);
-
+    GUI gui;
     byte connectionStatus = 0;
-
     bool initialDataReceived = false;
-
     int tickrate = 10;
 
     public override void _Ready()
@@ -54,27 +34,23 @@ public partial class Client : Node
         gui = GetNode<GUI>("/root/Map/GUI");
         // end
         SetConnectionStatusText(0); // sets status text to not connected
-
-        // set up timer
-        timeoutTimer.Elapsed += ServerTimedOutEvent;
-        timeoutTimer.Enabled = true;
-        // end set up timer
-
     }
 
-    public async void Connect(string serverAddress, int port, string username, string password)
+    public async void Connect(string serverIpAddressString, int port, string username, string password)
     {
         try
         {
-            if (serverAddress == "localhost") { serverAddress = "127.0.0.1"; }
+            if (serverIpAddressString == "localhost") { serverIpAddressString = "127.0.0.1"; }
 
-            serverConnection = new TcpClient(serverAddress, port); // connects to tcp server
-            serverStream = serverConnection.GetStream();
+            IPAddress serverIpAddress = IPAddress.Parse(serverIpAddressString);
 
-            serverTcpEndpoint = (IPEndPoint)serverConnection.Client.RemoteEndPoint;
+            // connects to tcp server
+            IPEndPoint serverTcpEndpoint = new IPEndPoint(serverIpAddress, port);
+            clientTcpSocket.Connect(serverTcpEndpoint);
 
-            clientUdpSocket.Connect(IPAddress.Parse(serverAddress), port + 1); // connects to udp server
-            //IPEndPoint localUdpEndpoint = (IPEndPoint)clientUdpSocket.LocalEndPoint;
+            // connects to udp server
+            clientUdpSocket.Connect(serverIpAddress, port + 1);
+            IPEndPoint localUdpEndpoint = (IPEndPoint)clientUdpSocket.LocalEndPoint;
 
             string hashedPassword = "";
             using (var passwordHasher = new PasswordHasher())
@@ -91,7 +67,7 @@ public partial class Client : Node
                 //udpPort = localUdpEndpoint.Port
             };
             string jsonData = JsonSerializer.Serialize(loginData, LoginDataContext.Default.LoginData);
-            await Send(1, jsonData, true);
+            await SendTcp(1, jsonData);
 
             GD.Print("Sent login data to the server");
 
@@ -104,7 +80,7 @@ public partial class Client : Node
         }
     }
 
-    private void AuthenticationSuccessful(int clientIndex, int maxPlayers)
+    void AuthenticationSuccessful(int clientIndex, int maxPlayers)
     {
         // GD.Print("Authentication successful, waiting for server to send initial data");
         // StatusLabel.Text = "Authentication successful, waiting for server to send initial data";
@@ -118,74 +94,58 @@ public partial class Client : Node
         GD.Print("Initial data received, connected");
         SetConnectionStatusText(1);
     }
-    private async Task ReceiveTcpDataFromServer()
-    {
-
-        while (true)
-        {
-            try
-            {
-                byte[] buffer = new byte[8192];
-                int receivedBytes = await serverStream.ReadAsync(buffer, 0, buffer.Length);
-                //GD.Print(receivedBytes);
-                ProcessBuffer(buffer, receivedBytes);
-            }
-            catch
-            {
-                GD.Print("Error receiving UDP packet");
-            }
-        }
-    }
-    private async Task ReceiveUdpDataFromServer()
+    async Task ReceiveTcpDataFromServer()
     {
         try
         {
+            byte[] buffer = new byte[1024];
+            int bytesReceived;
             while (true)
             {
-                byte[] buffer = new byte[4096];
-
-                int receivedBytes = await clientUdpSocket.ReceiveAsync(buffer, SocketFlags.None);
-
-                GD.Print("receivedudp");
-
-
-                ProcessBuffer(buffer, receivedBytes);
-
+                bytesReceived = await clientTcpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+                ProcessBuffer(buffer, bytesReceived);
             }
         }
         catch
         {
-
+            GD.Print("Error receiving TCP packet");
         }
     }
-    private async Task SendPositionToServer()
+    async Task ReceiveUdpDataFromServer()
     {
-        while (true)
+        try
         {
-            try
+            byte[] buffer = new byte[4096];
+            int bytesReceived;
+            while (true)
+            {
+                bytesReceived = await clientUdpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+                ProcessBuffer(buffer, bytesReceived);
+            }
+        }
+        catch
+        {
+            GD.Print("Error receiving UDP packet");
+        }
+    }
+    async Task SendPositionToServer()
+    {
+        try
+        {
+            string jsonData;
+            while (true)
             {
                 Thread.Sleep(tickrate);
-                string jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerPositionContext.Default.PlayerPosition);
-                await Send(3, jsonData, false);
+                jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerPositionContext.Default.PlayerPosition);
+                await SendUdp(3, jsonData);
             }
-            catch
-            {
-                // GD.Print("Error sending UDP packet");
-            }
-
+        }
+        catch
+        {
+            // GD.Print("Error sending UDP packet");
         }
     }
-    private void ServerTimedOutEvent(Object source, ElapsedEventArgs e)
-    {
-        // SetConnectionStatusText(2);
-    }
-    private void ResetTimeoutTimer()
-    {
-        timeoutTimer.Stop();
-        timeoutTimer.Interval = 1000;
-        timeoutTimer.Start();
-    }
-    private void SetConnectionStatusText(byte newStatus)
+    void SetConnectionStatusText(byte newStatus)
     {
         connectionStatus = newStatus;
         switch (newStatus)
@@ -201,30 +161,10 @@ public partial class Client : Node
                 break;
         }
     }
-    private async Task Send(byte commandType, string message, bool reliable)
-    {
-        try
-        {
-            byte[] messageByte = Encoding.ASCII.GetBytes($"#{commandType}#${message}$");
 
-            if (reliable)
-            {
-                await serverStream.WriteAsync(messageByte);
-            }
-            else
-            {
-                await clientUdpSocket.SendAsync(messageByte, SocketFlags.None);
-            }
-        }
-        catch
-        {
-            // Console.WriteLine($"Error sending message type {commandType}. Exception: {ex.Message}");
-        }
-    }
-    private async void ProcessBuffer(byte[] receivedBytes, int byteLength)
+    async void ProcessBuffer(byte[] receivedBytes, int byteLength)
     {
         string packetString = Encoding.ASCII.GetString(receivedBytes, 0, byteLength);
-
 
         string packetTypePattern = @"#(.*)#";
         string packetDataPattern = @"\$(.*?)\$";
@@ -242,9 +182,8 @@ public partial class Client : Node
 
             await ProcessDataSentByServer(packet);
         }
-
     }
-    private async Task ProcessDataSentByServer(Packet packet)
+    async Task ProcessDataSentByServer(Packet packet)
     {
         try
         {
@@ -252,10 +191,8 @@ public partial class Client : Node
             {
                 // Server is pinging the client
                 case 0:
-                    // GD.Print("Server sent a ping");
-                    ResetTimeoutTimer();
                     if (connectionStatus != 1) CallDeferred(nameof(SetConnectionStatusText), 1); // sets connection status text to connected, if its not already
-                    await Send(0, "", false);
+                    await SendUdp(0, "");
                     break;
 
                 // Type 1 means server is responding to login/registering
@@ -300,7 +237,7 @@ public partial class Client : Node
                 // Type 3 means server is sending position of other players
                 case 3:
                     if (!initialDataReceived) break;
-
+                    GD.Print(packet.data);
                     playersManager.everyPlayersPosition = JsonSerializer.Deserialize(packet.data, EveryPlayersPositionContext.Default.EveryPlayersPosition);
                     playersManager.CallDeferred(nameof(playersManager.ProcessOtherPlayerPosition));
                     break;
@@ -313,5 +250,33 @@ public partial class Client : Node
         {
             GD.Print("Packet error");
         }
+    }
+    async Task SendTcp(byte commandType, string message)
+    {
+        try
+        {
+            byte[] messageBytes = EncodeMessage(commandType, message);
+            await clientTcpSocket.SendAsync(messageBytes, SocketFlags.None);
+        }
+        catch
+        {
+            Console.WriteLine($"Error sending TCP message type {commandType}.");
+        }
+    }
+    async Task SendUdp(byte commandType, string message)
+    {
+        try
+        {
+            byte[] messageBytes = EncodeMessage(commandType, message);
+            await clientUdpSocket.SendAsync(messageBytes, SocketFlags.None);
+        }
+        catch
+        {
+            Console.WriteLine($"Error sending UDP message type {commandType}.");
+        }
+    }
+    byte[] EncodeMessage(byte commandType, string message)
+    {
+        return Encoding.ASCII.GetBytes($"#{commandType}#${message}$");
     }
 }

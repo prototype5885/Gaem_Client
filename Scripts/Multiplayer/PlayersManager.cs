@@ -16,12 +16,12 @@ public partial class PlayersManager : Node3D
 
     public PlayerPosition localPlayer = new PlayerPosition(); // Position of local player
 
-    public Vector3[] puppetPositions; // Position of puppet players
-    public Vector3[] puppetRotations; // Rotation of puppet players
+    Vector3[] puppetPositions; // Position of puppet players
+    Vector3[] puppetRotations; // Rotation of puppet players
 
 
-    public bool interpolatePuppetPositions = false;
-    public float interpolationSpeed = 4f;
+    bool interpolatePuppetPositions = false;
+    float interpolationSpeed = 4f;
 
     public override void _Ready()
     {
@@ -126,11 +126,11 @@ public partial class PlayersManager : Node3D
         {
             if (everyPlayersPosition.positions[i] == null) // Runs if player is not found in given slot index
             {
+
                 puppetPositions[i] = new Vector3(0f, -10f, 0f); // Resets puppet player position if not in use
             }
             else // Runs if player is found
             {
-                // System.Console.WriteLine(playerPositionAll.positions[i].pos);
 
                 puppetPositions[i] = new Vector3(everyPlayersPosition.positions[i].x, everyPlayersPosition.positions[i].y, everyPlayersPosition.positions[i].z); // Puts the updated position of puppet players in a vector3 array
                 puppetRotations[i] = new Vector3(everyPlayersPosition.positions[i].rx, everyPlayersPosition.positions[i].ry, 0f); // Puts the updated rotation of puppet players in a vector3 array
