@@ -18,6 +18,8 @@ public partial class Client : Node
     readonly Socket clientTcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     readonly Socket clientUdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
+    readonly AesEncryption aes = new AesEncryption();
+
     Label StatusLabel;
     PlayersManager playersManager;
     public bool loginOrRegister; // this is needed so when server sends back response about authentication, the authenticator will know
@@ -162,15 +164,20 @@ public partial class Client : Node
         }
     }
 
-    async void ProcessBuffer(byte[] receivedBytes, int byteLength)
+    async void ProcessBuffer(byte[] buffer, int byteLength)
     {
-        string packetString = Encoding.ASCII.GetString(receivedBytes, 0, byteLength);
+        //string bufferString = Encoding.ASCII.GetString(receivedBytes, 0, byteLength);
+
+        byte[] receivedBytes = new byte[byteLength];
+        Array.Copy(buffer, receivedBytes, byteLength);
+
+        string receivedBytesInString = aes.Decrypt(receivedBytes);
 
         string packetTypePattern = @"#(.*)#";
         string packetDataPattern = @"\$(.*?)\$";
 
-        MatchCollection packetTypeMatches = Regex.Matches(packetString, packetTypePattern);
-        MatchCollection packetDataMatches = Regex.Matches(packetString, packetDataPattern);
+        MatchCollection packetTypeMatches = Regex.Matches(receivedBytesInString, packetTypePattern);
+        MatchCollection packetDataMatches = Regex.Matches(receivedBytesInString, packetDataPattern);
 
         for (int i = 0; i < packetTypeMatches.Count; i++)
         {
@@ -237,7 +244,7 @@ public partial class Client : Node
                 // Type 3 means server is sending position of other players
                 case 3:
                     if (!initialDataReceived) break;
-                    GD.Print(packet.data);
+                    //GD.Print(packet.data);
                     playersManager.everyPlayersPosition = JsonSerializer.Deserialize(packet.data, EveryPlayersPositionContext.Default.EveryPlayersPosition);
                     playersManager.CallDeferred(nameof(playersManager.ProcessOtherPlayerPosition));
                     break;
@@ -255,7 +262,14 @@ public partial class Client : Node
     {
         try
         {
-            byte[] messageBytes = EncodeMessage(commandType, message);
+            byte[] messageBytes = EncodeMessage(commandType, message, true);
+
+            string byteString = string.Empty;
+            foreach (byte b in messageBytes)
+            {
+                byteString += b.ToString();
+            }
+            GD.PrintS(byteString);
             await clientTcpSocket.SendAsync(messageBytes, SocketFlags.None);
         }
         catch
@@ -267,7 +281,7 @@ public partial class Client : Node
     {
         try
         {
-            byte[] messageBytes = EncodeMessage(commandType, message);
+            byte[] messageBytes = EncodeMessage(commandType, message, true);
             await clientUdpSocket.SendAsync(messageBytes, SocketFlags.None);
         }
         catch
@@ -275,8 +289,12 @@ public partial class Client : Node
             Console.WriteLine($"Error sending UDP message type {commandType}.");
         }
     }
-    byte[] EncodeMessage(byte commandType, string message)
+    byte[] EncodeMessage(byte commandType, string message, bool encrypted)
     {
-        return Encoding.ASCII.GetBytes($"#{commandType}#${message}$");
+        string combinedMessage = $"#{commandType}#${message}$";
+        if (encrypted)
+            return aes.Encrypt(combinedMessage);
+        else
+            return Encoding.ASCII.GetBytes(combinedMessage);
     }
 }

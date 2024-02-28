@@ -12,7 +12,6 @@ public class LoginData
     public bool loginOrRegister { get; set; } // True if login, false if register
     public string username { get; set; } // Username
     public string password { get; set; } // Password
-    public int udpPort { get; set; }
 }
 
 // PlayerPosition
