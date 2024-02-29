@@ -1,5 +1,6 @@
 using Godot;
 using ProToType;
+using System;
 
 
 public partial class PlayersManager : Node3D
@@ -22,6 +23,7 @@ public partial class PlayersManager : Node3D
 
     bool interpolatePuppetPositions = false;
     float interpolationSpeed = 4f;
+    //byte roundValue = 7;
 
     public override void _Ready()
     {
@@ -42,7 +44,7 @@ public partial class PlayersManager : Node3D
     {
         puppetPositions = new Vector3[maxPlayers]; // Initializes the vector3 array for puppet positions
         puppetRotations = new Vector3[maxPlayers]; // Initializes the vector3 array for puppet rotations
-        everyPlayersPosition.positions = new PlayerPosition[maxPlayers]; // Initializes the array containing players
+        everyPlayersPosition.p = new PlayerPosition[maxPlayers]; // Initializes the array containing players
 
         for (int i = 0; i < maxPlayers; i++)
         {
@@ -64,12 +66,21 @@ public partial class PlayersManager : Node3D
     }
     private void PrepareLocalPlayerPositionForSending()
     {
+        //localPlayer.x = (float)Math.Round(playerCharacter.Position.X, roundValue);
+        //localPlayer.y = (float)Math.Round(playerCharacter.Position.Y, roundValue);
+        //localPlayer.z = (float)Math.Round(playerCharacter.Position.Z, roundValue);
+
+        //localPlayer.rx = (float)Math.Round(playerHead.Rotation.X, roundValue);
+        //localPlayer.ry = (float)Math.Round(playerCharacter.Rotation.Y, roundValue);
+
         localPlayer.x = playerCharacter.Position.X;
         localPlayer.y = playerCharacter.Position.Y;
         localPlayer.z = playerCharacter.Position.Z;
 
         localPlayer.rx = playerHead.Rotation.X;
         localPlayer.ry = playerCharacter.Rotation.Y;
+
+
     }
     private void InterpolatePuppetPlayersPosition(float delta)
     {
@@ -98,13 +109,8 @@ public partial class PlayersManager : Node3D
                 puppetPosition.Y = Mathf.Lerp(puppetPosition.Y, puppetPositions[i].Y, speed);
                 puppetPosition.Z = Mathf.Lerp(puppetPosition.Z, puppetPositions[i].Z, speed);
 
-                //puppetRotation.X = Mathf.Lerp(puppetRotation.X, puppetRotations[i].X, speed);
                 puppetRotation.Y = Mathf.LerpAngle(puppetRotation.Y, puppetRotations[i].Y, speed); // Rotates the puppet body only on Y angle
-                //puppetRotation.Z = Mathf.Lerp(puppetRotation.Z, puppetRotations[i].Z, speed);
-
                 puppetHeadRotation.X = Mathf.LerpAngle(puppetHeadRotation.X, puppetRotations[i].X, speed); // Rotates the puppet head only on X angle
-                //puppetHeadRotation.Y = Mathf.Lerp(puppetRotation.Y, puppetRotations[i].Y, speed);
-                //puppetHeadRotation.Z = Mathf.Lerp(puppetRotation.Z, puppetRotations[i].Z, speed);
             }
             else
             {
@@ -117,14 +123,12 @@ public partial class PlayersManager : Node3D
             puppet.Rotation = puppetRotation; // Sets the final rotation of the puppet
             puppetHead.Rotation = puppetHeadRotation; // Sets the final rotation of the puppet head
         }
-
-
     }
     public void ProcessOtherPlayerPosition()
     {
-        for (int i = 0; i < everyPlayersPosition.positions.Length; i++)
+        for (int i = 0; i < everyPlayersPosition.p.Length; i++)
         {
-            if (everyPlayersPosition.positions[i] == null) // Runs if player is not found in given slot index
+            if (everyPlayersPosition.p[i] == null) // Runs if player is not found in given slot index
             {
 
                 puppetPositions[i] = new Vector3(0f, -10f, 0f); // Resets puppet player position if not in use
@@ -132,8 +136,8 @@ public partial class PlayersManager : Node3D
             else // Runs if player is found
             {
 
-                puppetPositions[i] = new Vector3(everyPlayersPosition.positions[i].x, everyPlayersPosition.positions[i].y, everyPlayersPosition.positions[i].z); // Puts the updated position of puppet players in a vector3 array
-                puppetRotations[i] = new Vector3(everyPlayersPosition.positions[i].rx, everyPlayersPosition.positions[i].ry, 0f); // Puts the updated rotation of puppet players in a vector3 array
+                puppetPositions[i] = new Vector3(everyPlayersPosition.p[i].x, everyPlayersPosition.p[i].y, everyPlayersPosition.p[i].z); // Puts the updated position of puppet players in a vector3 array
+                puppetRotations[i] = new Vector3(everyPlayersPosition.p[i].rx, everyPlayersPosition.p[i].ry, 0f); // Puts the updated rotation of puppet players in a vector3 array
 
             }
         }

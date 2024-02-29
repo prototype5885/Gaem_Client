@@ -44,7 +44,7 @@ internal partial class EveryPlayersPositionContext : JsonSerializerContext
 }
 public class EveryPlayersPosition
 {
-    public PlayerPosition[] positions { get; set; }
+    public PlayerPosition[] p { get; set; }
 }
 
 // InitialData

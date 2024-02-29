@@ -28,6 +28,8 @@ public partial class Client : Node
     bool initialDataReceived = false;
     int tickrate = 10;
 
+    bool encryption = true;
+
     public override void _Ready()
     {
         // init
@@ -166,13 +168,20 @@ public partial class Client : Node
 
     async void ProcessBuffer(byte[] buffer, int byteLength)
     {
-        //string bufferString = Encoding.ASCII.GetString(receivedBytes, 0, byteLength);
+        //GD.Print(Encoding.ASCII.GetString(buffer, 0, byteLength));
+        string receivedBytesInString = string.Empty;
+        if (encryption)
+        {
+            byte[] receivedBytes = new byte[byteLength];
+            Array.Copy(buffer, receivedBytes, byteLength);
 
-        byte[] receivedBytes = new byte[byteLength];
-        Array.Copy(buffer, receivedBytes, byteLength);
-
-        string receivedBytesInString = aes.Decrypt(receivedBytes);
-
+            receivedBytesInString = aes.Decrypt(receivedBytes);
+        }
+        else
+        {
+            receivedBytesInString = Encoding.ASCII.GetString(buffer, 0, byteLength);
+        }
+        GD.Print(receivedBytesInString);
         string packetTypePattern = @"#(.*)#";
         string packetDataPattern = @"\$(.*?)\$";
 
@@ -262,14 +271,8 @@ public partial class Client : Node
     {
         try
         {
-            byte[] messageBytes = EncodeMessage(commandType, message, true);
-
-            string byteString = string.Empty;
-            foreach (byte b in messageBytes)
-            {
-                byteString += b.ToString();
-            }
-            GD.PrintS(byteString);
+            byte[] messageBytes = EncodeMessage(commandType, message);
+            //GD.Print("TCP message length: " + messageBytes.Length);
             await clientTcpSocket.SendAsync(messageBytes, SocketFlags.None);
         }
         catch
@@ -281,7 +284,8 @@ public partial class Client : Node
     {
         try
         {
-            byte[] messageBytes = EncodeMessage(commandType, message, true);
+            byte[] messageBytes = EncodeMessage(commandType, message);
+            //GD.Print("UDP message length: " + messageBytes.Length);
             await clientUdpSocket.SendAsync(messageBytes, SocketFlags.None);
         }
         catch
@@ -289,12 +293,15 @@ public partial class Client : Node
             Console.WriteLine($"Error sending UDP message type {commandType}.");
         }
     }
-    byte[] EncodeMessage(byte commandType, string message, bool encrypted)
+    byte[] EncodeMessage(byte commandType, string message)
     {
-        string combinedMessage = $"#{commandType}#${message}$";
-        if (encrypted)
-            return aes.Encrypt(combinedMessage);
+        if (encryption)
+        {
+            return aes.Encrypt($"#{commandType}#${message}$");
+        }
         else
-            return Encoding.ASCII.GetBytes(combinedMessage);
+        {
+            return Encoding.ASCII.GetBytes($"#{commandType}#${message}$");
+        }
     }
 }
