@@ -52,7 +52,6 @@ public partial class LoginWindow : Control
         switch (receivedCode)
         {
             case 1: // Login Successful
-                gui.CloseWindows();
                 gui.CallDeferred(nameof(gui.CloseWindows));
                 gui.CallDeferred(nameof(gui.PlayerControlsEnabled), true);
                 return true;

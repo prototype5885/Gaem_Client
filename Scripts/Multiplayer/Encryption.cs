@@ -3,13 +3,10 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-public class AesEncryption
+public class Encryption
 {
     const byte ivLength = 16;
-
-    byte[] key = Encoding.ASCII.GetBytes("0123456789abcdef");
-
-    public byte[] Encrypt(string message)
+    public static byte[] Encrypt(string message, byte[] encryptionKey)
     {
         try
         {
@@ -24,7 +21,7 @@ public class AesEncryption
 
             using (Aes aes = Aes.Create())
             {
-                aes.Key = key;
+                aes.Key = encryptionKey;
                 aes.IV = randomIV;
 
                 using (MemoryStream msEncrypt = new MemoryStream())
@@ -51,7 +48,7 @@ public class AesEncryption
         }
 
     }
-    public string Decrypt(byte[] encryptedMessageWithIV)
+    public static string Decrypt(byte[] encryptedMessageWithIV, byte[] encryptionKey)
     {
         try
         {
@@ -63,7 +60,7 @@ public class AesEncryption
 
             using (Aes aes = Aes.Create())
             {
-                aes.Key = key;
+                aes.Key = encryptionKey;
                 aes.IV = extractedIV;
 
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);

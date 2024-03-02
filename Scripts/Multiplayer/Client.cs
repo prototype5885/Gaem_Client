@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
+
 
 // using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -18,17 +20,15 @@ public partial class Client : Node
     readonly Socket clientTcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     readonly Socket clientUdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
-    readonly AesEncryption aes = new AesEncryption();
-
     Label StatusLabel;
     PlayersManager playersManager;
     public bool loginOrRegister; // this is needed so when server sends back response about authentication, the authenticator will know
     GUI gui;
     byte connectionStatus = 0;
     bool initialDataReceived = false;
-    int tickrate = 10;
 
     bool encryption = true;
+    static byte[] encryptionKey = Encoding.ASCII.GetBytes("0123456789ABCDEF0123456789ABCDEF");
 
     public override void _Ready()
     {
@@ -56,10 +56,11 @@ public partial class Client : Node
             clientUdpSocket.Connect(serverIpAddress, port + 1);
             IPEndPoint localUdpEndpoint = (IPEndPoint)clientUdpSocket.LocalEndPoint;
 
-            string hashedPassword = "";
-            using (var passwordHasher = new PasswordHasher())
+            string hashedPassword = String.Empty;
+            using (SHA512 sha512 = SHA512.Create())
             {
-                hashedPassword = passwordHasher.HashPassword(password + "secretxd");
+                byte[] hashedBytes = sha512.ComputeHash(Encoding.UTF8.GetBytes(password + "secretxd"));
+                hashedPassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
             }
 
             // Sends username / pass to server
@@ -102,11 +103,10 @@ public partial class Client : Node
     {
         try
         {
-            byte[] buffer = new byte[1024];
-            int bytesReceived;
             while (true)
             {
-                bytesReceived = await clientTcpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+                byte[] buffer = new byte[2048];
+                int bytesReceived = await clientTcpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
                 ProcessBuffer(buffer, bytesReceived);
             }
         }
@@ -119,11 +119,10 @@ public partial class Client : Node
     {
         try
         {
-            byte[] buffer = new byte[4096];
-            int bytesReceived;
             while (true)
             {
-                bytesReceived = await clientUdpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+                byte[] buffer = new byte[8192];
+                int bytesReceived = await clientUdpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
                 ProcessBuffer(buffer, bytesReceived);
             }
         }
@@ -136,11 +135,11 @@ public partial class Client : Node
     {
         try
         {
-            string jsonData;
+            int tickrate = 10;
             while (true)
             {
                 Thread.Sleep(tickrate);
-                jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerPositionContext.Default.PlayerPosition);
+                string jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerPositionContext.Default.PlayerPosition);
                 await SendUdp(3, jsonData);
             }
         }
@@ -168,36 +167,45 @@ public partial class Client : Node
 
     async void ProcessBuffer(byte[] buffer, int byteLength)
     {
-        //GD.Print(Encoding.ASCII.GetString(buffer, 0, byteLength));
-        string receivedBytesInString = string.Empty;
-        if (encryption)
+        try
         {
-            byte[] receivedBytes = new byte[byteLength];
-            Array.Copy(buffer, receivedBytes, byteLength);
+            //GD.Print(Encoding.ASCII.GetString(buffer, 0, byteLength));
+            string receivedBytesInString = string.Empty;
+            if (encryption)
+            {
+                byte[] receivedBytes = new byte[byteLength];
+                Array.Copy(buffer, receivedBytes, byteLength);
 
-            receivedBytesInString = aes.Decrypt(receivedBytes);
+                receivedBytesInString = Encryption.Decrypt(receivedBytes, encryptionKey);
+            }
+            else
+            {
+                receivedBytesInString = Encoding.ASCII.GetString(buffer, 0, byteLength);
+            }
+            //GD.Print(receivedBytesInString);
+            string packetTypePattern = @"#(.*)#";
+            string packetDataPattern = @"\$(.*?)\$";
+
+            MatchCollection packetTypeMatches = Regex.Matches(receivedBytesInString, packetTypePattern);
+            MatchCollection packetDataMatches = Regex.Matches(receivedBytesInString, packetDataPattern);
+
+            for (int i = 0; i < packetTypeMatches.Count; i++)
+            {
+                int.TryParse(packetTypeMatches[i].Groups[1].Value, out int typeOfPacket);
+
+                Packet packet = new Packet();
+                packet.type = typeOfPacket;
+                packet.data = packetDataMatches[i].Groups[1].Value;
+
+                await ProcessDataSentByServer(packet);
+            }
         }
-        else
+        catch
         {
-            receivedBytesInString = Encoding.ASCII.GetString(buffer, 0, byteLength);
+            GD.Print("Error processing packet");
         }
-        GD.Print(receivedBytesInString);
-        string packetTypePattern = @"#(.*)#";
-        string packetDataPattern = @"\$(.*?)\$";
 
-        MatchCollection packetTypeMatches = Regex.Matches(receivedBytesInString, packetTypePattern);
-        MatchCollection packetDataMatches = Regex.Matches(receivedBytesInString, packetDataPattern);
 
-        for (int i = 0; i < packetTypeMatches.Count; i++)
-        {
-            int.TryParse(packetTypeMatches[i].Groups[1].Value, out int typeOfPacket);
-
-            Packet packet = new Packet();
-            packet.type = typeOfPacket;
-            packet.data = packetDataMatches[i].Groups[1].Value;
-
-            await ProcessDataSentByServer(packet);
-        }
     }
     async Task ProcessDataSentByServer(Packet packet)
     {
@@ -297,11 +305,11 @@ public partial class Client : Node
     {
         if (encryption)
         {
-            return aes.Encrypt($"#{commandType}#${message}$");
+            return Encryption.Encrypt($"#{commandType}#${message}$", encryptionKey); // encodes the message encrypted
         }
         else
         {
-            return Encoding.ASCII.GetBytes($"#{commandType}#${message}$");
+            return Encoding.ASCII.GetBytes($"#{commandType}#${message}$"); // encodes the message
         }
     }
 }

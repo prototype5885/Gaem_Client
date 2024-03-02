@@ -20,7 +20,6 @@ public partial class PlayersManager : Node3D
     Vector3[] puppetPositions; // Position of puppet players
     Vector3[] puppetRotations; // Rotation of puppet players
 
-
     bool interpolatePuppetPositions = false;
     float interpolationSpeed = 4f;
     //byte roundValue = 7;
