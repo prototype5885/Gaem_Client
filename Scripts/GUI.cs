@@ -7,9 +7,9 @@ public partial class GUI : Control
 
     public Client client;
 
-    public Control Windows;
+    public static Control Windows;
 
-    private Control ConnectWindow;
+    static Control ConnectWindow;
     public Control LoginWindow;
     public Control RegistrationWindow;
 
@@ -21,7 +21,7 @@ public partial class GUI : Control
     public override void _Ready()
     {
         // init
-        client = GetNode<Client>("/root/Map/MultiplayerManager/Client");
+        client = GetNode<Client>("/root/Map/MultiplayerManager");
 
         Windows = GetChild<Control>(1);
 
@@ -42,11 +42,11 @@ public partial class GUI : Control
     }
     public void PlayerControlsEnabled(bool input)
     {
-        if (input)
+        if (input == true)
         {
             Input.MouseMode = Input.MouseModeEnum.Captured;
         }
-        else
+        else if (input == false)
         {
             Input.MouseMode = Input.MouseModeEnum.Visible;
         }

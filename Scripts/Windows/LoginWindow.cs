@@ -3,9 +3,9 @@ using System;
 
 public partial class LoginWindow : Control
 {
-    private GUI gui;
-    private LineEdit UsernameInput;
-    private LineEdit PasswordInput;
+    static GUI gui;
+    static LineEdit UsernameInput;
+    static LineEdit PasswordInput;
 
     public override void _Ready()
     {
@@ -20,7 +20,7 @@ public partial class LoginWindow : Control
         panel.GetChild<Button>(3).Pressed += () => OnRegisterPressed();
         panel.GetChild<Button>(4).Pressed += () => OnChangeServerPressed();
     }
-    private void OnLoginPressed()
+    void OnLoginPressed()
     {
         //try
         //{
@@ -65,19 +65,18 @@ public partial class LoginWindow : Control
                 gui.errorLabel.Text = "This user is already logged in";
                 return false;
             case -1:
-                // gui.BackToConnectWindow();
                 gui.errorLabel.Text = "Failed to connect to the server.";
                 return false;
         }
         return false;
     }
-    private void OnRegisterPressed()
+    void OnRegisterPressed()
     {
         gui.CloseWindows();
         gui.RegistrationWindow.Visible = true;
     }
 
-    private void OnChangeServerPressed()
+    void OnChangeServerPressed()
     {
         gui.CloseWindows();
         gui.BackToConnectWindow();

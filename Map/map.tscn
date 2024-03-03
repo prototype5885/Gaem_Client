@@ -5,11 +5,13 @@
 [ext_resource type="Script" path="res://Scripts/Multiplayer/Client.cs" id="2_7pnnp"]
 [ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
 [ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
-[ext_resource type="Theme" uid="uid://b25nqr38ccaa0" path="res://Etc/HUD.tres" id="8_57x1o"]
 [ext_resource type="Script" path="res://Scripts/Player/Hud/Hud.cs" id="9_58umg"]
 [ext_resource type="Script" path="res://Scripts/Windows/AddressWindow.cs" id="9_j43vl"]
 [ext_resource type="Script" path="res://Scripts/Windows/LoginWindow.cs" id="10_jojqg"]
 [ext_resource type="Script" path="res://Scripts/Windows/RegistrationWindow.cs" id="11_p3fko"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pt5bo"]
+bg_color = Color(0, 1, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fha85"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -40,20 +42,7 @@ data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0
 [node name="Map" type="Node3D"]
 
 [node name="MultiplayerManager" type="Node" parent="."]
-
-[node name="Client" type="Node" parent="MultiplayerManager"]
 script = ExtResource("2_7pnnp")
-
-[node name="StatusLabel" type="Label" parent="MultiplayerManager"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -900.0
-offset_bottom = 307.0
-grow_horizontal = 0
-theme_override_font_sizes/font_size = 32
-text = "Disconnected"
-horizontal_alignment = 2
 
 [node name="PlayersManager" type="Node3D" parent="."]
 script = ExtResource("2_5b6b8")
@@ -62,43 +51,74 @@ script = ExtResource("2_5b6b8")
 
 [node name="OtherPlayers" type="Node3D" parent="PlayersManager"]
 
-[node name="HUD" type="Control" parent="."]
-visible = false
-layout_mode = 3
+[node name="HUD" type="MarginContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("8_57x1o")
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
 script = ExtResource("9_58umg")
 
-[node name="Info" type="Label" parent="HUD"]
-layout_mode = 1
-offset_right = 771.0
-offset_bottom = 493.0
-text = "hrwhwh
-bgbhw"
+[node name="Debug" type="Control" parent="HUD"]
+layout_mode = 2
 
-[node name="InfoMultiplayer" type="Label" parent="HUD"]
+[node name="StatusLabel" type="Label" parent="HUD/Debug"]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -771.0
-offset_bottom = 493.0
+offset_left = -466.0
+offset_top = 51.0
+offset_bottom = 85.0
 grow_horizontal = 0
-text = "hrwhwh
-bgbhw"
+theme_override_font_sizes/font_size = 24
+text = "InfoMultiplayer"
 horizontal_alignment = 2
 
-[node name="Info2" type="Label" parent="HUD"]
+[node name="PingingIndicator" type="Panel" parent="HUD/Debug"]
 layout_mode = 1
-offset_top = 816.0
-offset_right = 771.0
-offset_bottom = 1309.0
-text = "hrwhwh
-bgbhw"
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -140.0
+offset_top = 13.0
+offset_right = -124.0
+offset_bottom = 29.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_pt5bo")
+
+[node name="ReceivedData" type="Label" parent="HUD/Debug"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -474.0
+offset_top = 127.0
+offset_bottom = 161.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "ReceivedData"
+horizontal_alignment = 2
+
+[node name="LatencyLabel" type="Label" parent="HUD/Debug"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -173.0
+offset_bottom = 34.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "Ping"
+horizontal_alignment = 2
+
+[node name="Info" type="Label" parent="HUD"]
+layout_mode = 2
+text = "faf"
 
 [node name="GUI" type="Control" parent="."]
 layout_mode = 3
@@ -110,18 +130,14 @@ grow_vertical = 2
 script = ExtResource("6_tmkbl")
 
 [node name="Chat" type="Panel" parent="GUI"]
-visible = false
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
+anchors_preset = 2
 anchor_top = 1.0
-anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -754.0
-offset_top = -519.0
-offset_right = -354.0
-offset_bottom = -119.0
-grow_horizontal = 0
+offset_left = 35.0
+offset_top = -434.0
+offset_right = 435.0
+offset_bottom = -34.0
 grow_vertical = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_fha85")
@@ -380,6 +396,7 @@ grow_vertical = 0
 text = "Change server"
 
 [node name="RegistrationWindow" type="Control" parent="GUI/JoinWindows"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

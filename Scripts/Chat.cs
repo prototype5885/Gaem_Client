@@ -1,4 +1,6 @@
 using Godot;
+using System.Text;
+using System.Threading.Tasks;
 public partial class Chat : Panel
 {
     PackedScene chatMessageScene;
@@ -27,7 +29,7 @@ public partial class Chat : Panel
         messages = messagesMargin.GetChild<VBoxContainer>(0);
         spamTimer = GetNode<Timer>("%SpamTimer");
         GUI = GetParent<GUI>();
-        client = GetNode<Client>("/root/Map/MultiplayerManager/Client");
+        client = GetNode<Client>("/root/Map/MultiplayerManager");
         // end
 
         //inputChat.Visible = false;
@@ -42,6 +44,7 @@ public partial class Chat : Panel
                 if (!inputChat.Editable)
                 {
                     StartTyping();
+                    return;
                 }
                 // else if (canMessage)
                 // {
@@ -58,14 +61,14 @@ public partial class Chat : Panel
             }
         }
     }
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        if (@event is InputEventMouseButton)
-        {
-            CleanMessage();
-        }
-    }
-    private void StartTyping()
+    //public override void _UnhandledInput(InputEvent @event)
+    //{
+    //    if (@event is InputEventMouseButton)
+    //    {
+    //        CleanMessage();
+    //    }
+    //}
+    void StartTyping()
     {
         GUI.PlayerControlsEnabled(false); // disable controls for player
         messagesMargin.Visible = true;
@@ -85,9 +88,9 @@ public partial class Chat : Panel
     {
         if (message != "")
         {
-            //Rpc(nameof(SendMessage), message); // send to server
-            //SendMessage(message);
-            //mpClient.messageToSend = message;
+            byte[] messageByte = Encoding.UTF8.GetBytes(message);
+            Task.Run(() => client.SendTcp(2, message));
+
             SpamCooldownEnded = false;
             spamTimer.Start();
         }

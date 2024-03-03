@@ -63,7 +63,7 @@ public partial class PlayersManager : Node3D
         InterpolatePuppetPlayersPosition((float)delta);
         PrepareLocalPlayerPositionForSending();
     }
-    private void PrepareLocalPlayerPositionForSending()
+    void PrepareLocalPlayerPositionForSending()
     {
         //localPlayer.x = (float)Math.Round(playerCharacter.Position.X, roundValue);
         //localPlayer.y = (float)Math.Round(playerCharacter.Position.Y, roundValue);
@@ -81,7 +81,7 @@ public partial class PlayersManager : Node3D
 
 
     }
-    private void InterpolatePuppetPlayersPosition(float delta)
+    void InterpolatePuppetPlayersPosition(float delta)
     {
         // Interpolation of puppet positions
         // Vector3 puppetPosition; // Local position value of the puppet

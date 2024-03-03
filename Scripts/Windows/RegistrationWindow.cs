@@ -2,11 +2,11 @@ using Godot;
 
 public partial class RegistrationWindow : Control
 {
-    private GUI gui;
+    GUI gui;
 
-    private LineEdit UsernameInput;
-    private LineEdit FirstPasswordInput;
-    private LineEdit SecondPasswordInput;
+    LineEdit UsernameInput;
+    LineEdit FirstPasswordInput;
+    LineEdit SecondPasswordInput;
 
     public override void _Ready()
     {
@@ -21,7 +21,7 @@ public partial class RegistrationWindow : Control
         panel.GetChild<Button>(3).Pressed += () => OnRegisterPressed();
         panel.GetChild<Button>(4).Pressed += () => OnBackPressed();
     }
-    private void OnRegisterPressed()
+    void OnRegisterPressed()
     {
         string username = UsernameInput.Text;
         string password = FirstPasswordInput.Text;
@@ -69,7 +69,7 @@ public partial class RegistrationWindow : Control
         }
         return false;
     }
-    private void OnBackPressed()
+    void OnBackPressed()
     {
         gui.CloseWindows();
         gui.LoginWindow.Visible = true;

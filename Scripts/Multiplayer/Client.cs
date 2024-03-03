@@ -17,28 +17,48 @@ using System.Timers;
 
 public partial class Client : Node
 {
-    readonly Socket clientTcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-    readonly Socket clientUdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+    Socket clientTcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+    Socket clientUdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
-    Label StatusLabel;
+
     PlayersManager playersManager;
     public bool loginOrRegister; // this is needed so when server sends back response about authentication, the authenticator will know
     GUI gui;
+    Hud hud;
+
     byte connectionStatus = 0;
     bool initialDataReceived = false;
 
     bool encryption = true;
     static byte[] encryptionKey = Encoding.ASCII.GetBytes("0123456789ABCDEF0123456789ABCDEF");
 
+    // timers for timeout
+    const int udpStartTimingOutTime = 2000;
+    System.Timers.Timer udpStartTimingOut = new System.Timers.Timer(udpStartTimingOutTime);
+    DateTime pingReceivedTime;
+
+    const int udpEndTimingOutTime = 4000;
+    System.Timers.Timer udpEndTimingOut = new System.Timers.Timer(udpEndTimingOutTime);
+
     public override void _Ready()
     {
         // init
-        StatusLabel = GetParent().GetChild<Label>(1);
         playersManager = GetNode<PlayersManager>("/root/Map/PlayersManager");
         gui = GetNode<GUI>("/root/Map/GUI");
+        hud = GetNode<Hud>("/root/Map/HUD");
         // end
-        SetConnectionStatusText(0); // sets status text to not connected
+        SetConnectionStatus(0); // sets status text to not connected
+
+        udpStartTimingOut.Elapsed += UdpTimingOut;
+        udpStartTimingOut.AutoReset = false;
+
+        udpEndTimingOut.Elapsed += UdpTimedOut;
+        udpEndTimingOut.AutoReset = false;
     }
+    //public override void _PhysicsProcess(double delta)
+    //{
+    //    GD.Print(clientTcpSocket.Connected);
+    //}
 
     public async void Connect(string serverIpAddressString, int port, string username, string password)
     {
@@ -50,16 +70,16 @@ public partial class Client : Node
 
             // connects to tcp server
             IPEndPoint serverTcpEndpoint = new IPEndPoint(serverIpAddress, port);
-            clientTcpSocket.Connect(serverTcpEndpoint);
+            await clientTcpSocket.ConnectAsync(serverTcpEndpoint);
 
             // connects to udp server
-            clientUdpSocket.Connect(serverIpAddress, port + 1);
+            await clientUdpSocket.ConnectAsync(serverIpAddress, port + 1);
             IPEndPoint localUdpEndpoint = (IPEndPoint)clientUdpSocket.LocalEndPoint;
 
             string hashedPassword = String.Empty;
-            using (SHA512 sha512 = SHA512.Create())
+            using (SHA512 sha = SHA512.Create())
             {
-                byte[] hashedBytes = sha512.ComputeHash(Encoding.UTF8.GetBytes(password + "secretxd"));
+                byte[] hashedBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password + "secretxd"));
                 hashedPassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
             }
 
@@ -80,8 +100,8 @@ public partial class Client : Node
         }
         catch (Exception ex) // Runs if there is no connection to the server
         {
-            GD.Print(ex);
-            //GD.Print("Failed to connect");
+            LoginWindow loginWindow = gui.LoginWindow as LoginWindow;
+            loginWindow.LoginResult(-1);
         }
     }
 
@@ -97,32 +117,37 @@ public partial class Client : Node
         Task.Run(() => ReceiveUdpDataFromServer());
 
         GD.Print("Initial data received, connected");
-        SetConnectionStatusText(1);
+        SetConnectionStatus(1);
+
+        udpStartTimingOut.Start(); // starts the timer that detects if connection to the server is lost
     }
     async Task ReceiveTcpDataFromServer()
     {
         try
         {
+            byte[] buffer = new byte[2048];
+            int bytesReceived;
             while (true)
             {
-                byte[] buffer = new byte[2048];
-                int bytesReceived = await clientTcpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+
+                bytesReceived = await clientTcpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
                 ProcessBuffer(buffer, bytesReceived);
             }
         }
         catch
         {
-            GD.Print("Error receiving TCP packet");
+            GD.Print($"Error receiving TCP packet");
         }
     }
     async Task ReceiveUdpDataFromServer()
     {
         try
         {
+            byte[] buffer = new byte[8192];
+            int bytesReceived;
             while (true)
             {
-                byte[] buffer = new byte[8192];
-                int bytesReceived = await clientUdpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
+                bytesReceived = await clientUdpSocket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
                 ProcessBuffer(buffer, bytesReceived);
             }
         }
@@ -135,12 +160,12 @@ public partial class Client : Node
     {
         try
         {
-            int tickrate = 10;
+            int tickrate = 100;
             while (true)
             {
                 Thread.Sleep(tickrate);
                 string jsonData = JsonSerializer.Serialize(playersManager.localPlayer, PlayerPositionContext.Default.PlayerPosition);
-                await SendUdp(3, jsonData);
+                await SendTcp(3, jsonData);
             }
         }
         catch
@@ -148,23 +173,6 @@ public partial class Client : Node
             // GD.Print("Error sending UDP packet");
         }
     }
-    void SetConnectionStatusText(byte newStatus)
-    {
-        connectionStatus = newStatus;
-        switch (newStatus)
-        {
-            case 0:
-                StatusLabel.Text = "Not connected";
-                break;
-            case 1:
-                StatusLabel.Text = "Connected";
-                break;
-            case 2:
-                StatusLabel.Text = "Timing out";
-                break;
-        }
-    }
-
     async void ProcessBuffer(byte[] buffer, int byteLength)
     {
         try
@@ -215,8 +223,19 @@ public partial class Client : Node
             {
                 // Server is pinging the client
                 case 0:
-                    if (connectionStatus != 1) CallDeferred(nameof(SetConnectionStatusText), 1); // sets connection status text to connected, if its not already
-                    await SendUdp(0, "");
+                    if (connectionStatus != 1)
+                        SetConnectionStatus(1); // sets connection status text to connected, if its not already
+
+                    hud.PingReceived(); // indicates on the screen for 250 ms that ping request has been received from the server
+
+                    CalculateLatency();
+                    pingReceivedTime = DateTime.UtcNow;
+
+                    udpStartTimingOut.Interval = udpStartTimingOutTime;
+                    udpEndTimingOut.Interval = udpEndTimingOutTime;
+                    udpEndTimingOut.Stop();
+
+                    await SendTcp(0, "");
                     break;
 
                 // Type 1 means server is responding to login/registering
@@ -227,7 +246,6 @@ public partial class Client : Node
                     {
                         CallDeferred(nameof(AuthenticationSuccessful), initialData.i, initialData.mp);
                     }
-
                     GD.Print("Server responded to login");
                     LoginWindow loginWindow = gui.LoginWindow as LoginWindow;
                     RegistrationWindow registrationWindow = gui.RegistrationWindow as RegistrationWindow;
@@ -246,13 +264,6 @@ public partial class Client : Node
                     {
                         initialDataReceived = true;
                     }
-                    // else
-                    // {
-
-                    //     initialDataReceived = false;
-                    //     serverStream.Close();
-                    //     serverConnection = null;
-                    // }
                     break;
 
                 case 2:
@@ -261,7 +272,6 @@ public partial class Client : Node
                 // Type 3 means server is sending position of other players
                 case 3:
                     if (!initialDataReceived) break;
-                    //GD.Print(packet.data);
                     playersManager.everyPlayersPosition = JsonSerializer.Deserialize(packet.data, EveryPlayersPositionContext.Default.EveryPlayersPosition);
                     playersManager.CallDeferred(nameof(playersManager.ProcessOtherPlayerPosition));
                     break;
@@ -275,20 +285,22 @@ public partial class Client : Node
             GD.Print("Packet error");
         }
     }
-    async Task SendTcp(byte commandType, string message)
+    public async Task SendTcp(byte commandType, string message)
     {
         try
         {
             byte[] messageBytes = EncodeMessage(commandType, message);
-            //GD.Print("TCP message length: " + messageBytes.Length);
             await clientTcpSocket.SendAsync(messageBytes, SocketFlags.None);
+            GD.Print($"Message {message} was sent successfully");
+
         }
         catch
         {
-            Console.WriteLine($"Error sending TCP message type {commandType}.");
+            //GD.Print($"Error sending TCP message type {commandType}.");
+            GD.Print($"Failed to send message {message}");
         }
     }
-    async Task SendUdp(byte commandType, string message)
+    public async Task SendUdp(byte commandType, string message)
     {
         try
         {
@@ -311,5 +323,28 @@ public partial class Client : Node
         {
             return Encoding.ASCII.GetBytes($"#{commandType}#${message}$"); // encodes the message
         }
+    }
+    void SetConnectionStatus(byte newStatus)
+    {
+        connectionStatus = newStatus;
+        hud.CallDeferred(nameof(hud.SetConnectionStatusText), connectionStatus);
+    }
+    void UdpTimingOut(object sender, ElapsedEventArgs e)
+    {
+        GD.Print("Started timing out");
+        SetConnectionStatus(2);
+        udpEndTimingOut.Start();
+    }
+    void UdpTimedOut(object sender, ElapsedEventArgs e)
+    {
+        GD.Print("Udp timed out");
+        SetConnectionStatus(3);
+    }
+    void CalculateLatency()
+    {
+        TimeSpan timespan = pingReceivedTime - DateTime.UtcNow;
+        int latency = Math.Abs(timespan.Milliseconds) / 2;
+        //GD.Print(latency);
+        hud.CallDeferred(nameof(hud.UpdateLatencyOnHud), latency);
     }
 }

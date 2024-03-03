@@ -1,35 +1,69 @@
 using Godot;
 using System;
+using System.Timers;
 
-public partial class Hud : Control
+public partial class Hud : MarginContainer
 {
-    Label info;
-    Label MultiplayerInfo;
-    // Stats stats;
-    //MultiplayerManager MultiplayerManager;
+    public static Label statusLabel;
+    public static Panel pingingIndicator;
 
+    public Label latencyLabel;
+
+    System.Timers.Timer pingingIndicatorTimer = new System.Timers.Timer(250);
     public override void _Ready()
     {
-        // init
-        info = GetNode<Label>("Info");
-        MultiplayerInfo = GetNode<Label>("InfoMultiplayer");
-        // stats = GetNode<Stats>("%Stats");
-        Timer time = GetNode<Timer>("/root/Map/TimeLoop");
-        //MultiplayerManager = GetNode<MultiplayerManager>("/root/Map/MultiplayerManager");
-        // end
+        statusLabel = GetNode<Label>("Debug/StatusLabel");
+        pingingIndicator = GetNode<Panel>("Debug/PingingIndicator");
+        latencyLabel = GetNode<Label>("Debug/LatencyLabel");
 
-        time.Connect("timeout", new Callable(this, nameof(update_info)));
+        //pingingIndicator.Visible = false;
 
-        //MultiplayerManager.Connect("PlayerConnected", new Callable(this, nameof(connected)));
+        pingingIndicatorTimer.Elapsed += PingingIndicatorExpired;
+        pingingIndicatorTimer.AutoReset = false;
 
-        // update_info();
+        pingingIndicatorTimer.Start();
     }
-    public void update_info()
+    public void PingReceived()
     {
-        // info.Text = "Money: " + stats.money.ToString() + "\n" + "Wages: " + stats.wage.ToString();
+        CallDeferred(nameof(ChangePingingIndicatorVisibility), true);
+        pingingIndicatorTimer.Start();
     }
-    //public void connected()
-    //{
-    //    MultiplayerInfo.Text = Multiplayer.GetUniqueId().ToString();
-    //}
+    void PingingIndicatorExpired(object sender, ElapsedEventArgs e)
+    {
+        CallDeferred(nameof(ChangePingingIndicatorVisibility), false);
+    }
+    static void ChangePingingIndicatorVisibility(bool visible)
+    {
+        //if (visible == false)
+        //{
+        //    pingingIndicator.Modulate = new Color(255, 0, 0);
+        //}
+        //else
+        //{
+        //    pingingIndicator.Modulate = new Color(0, 255, 0);
+        //}
+        pingingIndicator.Visible = visible;
+    }
+    public void UpdateLatencyOnHud(int latency)
+    {
+        latencyLabel.Text = latency.ToString();
+    }
+    public void SetConnectionStatusText(byte connectionStatus)
+    {
+        switch (connectionStatus)
+        {
+            case 0:
+                statusLabel.Text = "Not connected";
+                break;
+            case 1:
+                statusLabel.Text = "Connected";
+                break;
+            case 2:
+                statusLabel.Text = "Timing out";
+                break;
+            case 3:
+                statusLabel.Text = "Lost connection";
+                break;
+        }
+    }
 }

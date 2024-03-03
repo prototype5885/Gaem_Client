@@ -2,8 +2,8 @@ using Godot;
 
 public partial class AddressWindow : Control
 {
-    private GUI gui;
-    private LineEdit InputIP;
+    GUI gui;
+    LineEdit InputIP;
     LineEdit InputPort;
 
     public override void _Ready()
@@ -19,7 +19,7 @@ public partial class AddressWindow : Control
 
         SetAddress();
     }
-    private void SetAddress()
+    void SetAddress()
     {
         if (!int.TryParse(InputPort.Text, out int port))
         {
@@ -31,7 +31,7 @@ public partial class AddressWindow : Control
         gui.ip = ip;
         gui.port = port;
     }
-    private void OnSetPressed()
+    void OnSetPressed()
     {
         SetAddress();
 
