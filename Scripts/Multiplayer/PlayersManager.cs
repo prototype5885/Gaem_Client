@@ -1,6 +1,9 @@
 using Godot;
 using ProToType;
 using System;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Threading;
 
 
 public partial class PlayersManager : Node3D
@@ -13,9 +16,9 @@ public partial class PlayersManager : Node3D
 
     Node3D otherplayers; // Location of "other players" node
 
-    public EveryPlayersPosition everyPlayersPosition = new EveryPlayersPosition(); // Array of every players' position
+    public static EveryPlayersPosition everyPlayersPosition = new EveryPlayersPosition(); // Array of every players' position
 
-    public PlayerPosition localPlayer = new PlayerPosition(); // Position of local player
+    public static PlayerPosition localPlayer = new PlayerPosition(); // Position of local player
 
     Vector3[] puppetPositions; // Position of puppet players
     Vector3[] puppetRotations; // Rotation of puppet players
@@ -59,7 +62,6 @@ public partial class PlayersManager : Node3D
     }
     public override void _Process(double delta)
     {
-        base._Process(delta);
         InterpolatePuppetPlayersPosition((float)delta);
         PrepareLocalPlayerPositionForSending();
     }
@@ -141,9 +143,21 @@ public partial class PlayersManager : Node3D
             }
         }
     }
-    public void ProcessOtherPlayerName()
+    public static async Task SendPositionToServer()
     {
-
+        try
+        {
+            while (true)
+            {
+                Thread.Sleep(Client.tickrate);
+                string jsonData = JsonSerializer.Serialize(localPlayer, PlayerPositionContext.Default.PlayerPosition);
+                await PacketProcessor.SendTcp(3, jsonData);
+            }
+        }
+        catch
+        {
+            // GD.Print("Error sending UDP packet");
+        }
     }
 }
 

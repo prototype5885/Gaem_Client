@@ -88,8 +88,7 @@ public partial class Chat : Panel
     {
         if (message != "")
         {
-            byte[] messageByte = Encoding.UTF8.GetBytes(message);
-            Task.Run(() => client.SendTcp(2, message));
+            Task.Run(() => PacketProcessor.SendTcp(2, message));
 
             SpamCooldownEnded = false;
             spamTimer.Start();

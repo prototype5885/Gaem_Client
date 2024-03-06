@@ -1,14 +1,13 @@
-[gd_scene load_steps=20 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=19 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
+[ext_resource type="Script" path="res://Scripts/NodeManager.cs" id="1_xlpas"]
 [ext_resource type="Script" path="res://Scripts/Multiplayer/PlayersManager.cs" id="2_5b6b8"]
 [ext_resource type="Script" path="res://Scripts/Multiplayer/Client.cs" id="2_7pnnp"]
 [ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
-[ext_resource type="Script" path="res://Scripts/GUI.cs" id="6_tmkbl"]
+[ext_resource type="Script" path="res://Scripts/GUI/GUI.cs" id="6_tmkbl"]
+[ext_resource type="Script" path="res://Scripts/GUI/ConnectWindows.cs" id="7_7rbfv"]
 [ext_resource type="Script" path="res://Scripts/Player/Hud/Hud.cs" id="9_58umg"]
-[ext_resource type="Script" path="res://Scripts/Windows/AddressWindow.cs" id="9_j43vl"]
-[ext_resource type="Script" path="res://Scripts/Windows/LoginWindow.cs" id="10_jojqg"]
-[ext_resource type="Script" path="res://Scripts/Windows/RegistrationWindow.cs" id="11_p3fko"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pt5bo"]
 bg_color = Color(0, 1, 0, 1)
@@ -40,9 +39,12 @@ data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0
 [sub_resource type="BoxMesh" id="BoxMesh_wkol4"]
 
 [node name="Map" type="Node3D"]
+script = ExtResource("1_xlpas")
 
 [node name="MultiplayerManager" type="Node" parent="."]
 script = ExtResource("2_7pnnp")
+
+[node name="PacketProcessor" type="Node" parent="MultiplayerManager"]
 
 [node name="PlayersManager" type="Node3D" parent="."]
 script = ExtResource("2_5b6b8")
@@ -211,15 +213,16 @@ unique_name_in_owner = true
 wait_time = 0.25
 one_shot = true
 
-[node name="JoinWindows" type="Control" parent="GUI"]
+[node name="ConnectWindows" type="Control" parent="GUI"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("7_7rbfv")
 
-[node name="AddressWindow" type="Control" parent="GUI/JoinWindows"]
+[node name="AddressWindow" type="Control" parent="GUI/ConnectWindows"]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -234,9 +237,8 @@ offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_k5sxp")
-script = ExtResource("9_j43vl")
 
-[node name="Panel" type="Panel" parent="GUI/JoinWindows/AddressWindow"]
+[node name="Panel" type="Panel" parent="GUI/ConnectWindows/AddressWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -244,7 +246,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="IP" type="LineEdit" parent="GUI/JoinWindows/AddressWindow/Panel"]
+[node name="IP" type="LineEdit" parent="GUI/ConnectWindows/AddressWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -261,7 +263,7 @@ text = "localhost"
 placeholder_text = "IP Address"
 max_length = 32
 
-[node name="Port" type="LineEdit" parent="GUI/JoinWindows/AddressWindow/Panel"]
+[node name="Port" type="LineEdit" parent="GUI/ConnectWindows/AddressWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -278,7 +280,7 @@ text = "1942"
 placeholder_text = "Port"
 max_length = 16
 
-[node name="Set" type="Button" parent="GUI/JoinWindows/AddressWindow/Panel"]
+[node name="Set" type="Button" parent="GUI/ConnectWindows/AddressWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -293,7 +295,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Accept address"
 
-[node name="LoginWindow" type="Control" parent="GUI/JoinWindows"]
+[node name="LoginWindow" type="Control" parent="GUI/ConnectWindows"]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -308,9 +310,8 @@ offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_k5sxp")
-script = ExtResource("10_jojqg")
 
-[node name="Panel" type="Panel" parent="GUI/JoinWindows/LoginWindow"]
+[node name="Panel" type="Panel" parent="GUI/ConnectWindows/LoginWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -318,7 +319,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Username" type="LineEdit" parent="GUI/JoinWindows/LoginWindow/Panel"]
+[node name="Username" type="LineEdit" parent="GUI/ConnectWindows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -335,7 +336,7 @@ text = "user"
 placeholder_text = "Username"
 max_length = 16
 
-[node name="Password" type="LineEdit" parent="GUI/JoinWindows/LoginWindow/Panel"]
+[node name="Password" type="LineEdit" parent="GUI/ConnectWindows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -353,7 +354,7 @@ placeholder_text = "Password"
 max_length = 16
 secret = true
 
-[node name="Login" type="Button" parent="GUI/JoinWindows/LoginWindow/Panel"]
+[node name="Login" type="Button" parent="GUI/ConnectWindows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -368,7 +369,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Login"
 
-[node name="Registration" type="Button" parent="GUI/JoinWindows/LoginWindow/Panel"]
+[node name="Registration" type="Button" parent="GUI/ConnectWindows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -383,7 +384,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Registration"
 
-[node name="ChangeServer" type="Button" parent="GUI/JoinWindows/LoginWindow/Panel"]
+[node name="ChangeServer" type="Button" parent="GUI/ConnectWindows/LoginWindow/Panel"]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -395,7 +396,7 @@ offset_bottom = -13.0
 grow_vertical = 0
 text = "Change server"
 
-[node name="RegistrationWindow" type="Control" parent="GUI/JoinWindows"]
+[node name="RegistrationWindow" type="Control" parent="GUI/ConnectWindows"]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -409,9 +410,8 @@ offset_right = 360.0
 offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("11_p3fko")
 
-[node name="Panel" type="Panel" parent="GUI/JoinWindows/RegistrationWindow"]
+[node name="Panel" type="Panel" parent="GUI/ConnectWindows/RegistrationWindow"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -419,7 +419,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Username" type="LineEdit" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
+[node name="Username" type="LineEdit" parent="GUI/ConnectWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -435,7 +435,7 @@ grow_vertical = 2
 placeholder_text = "Username"
 max_length = 16
 
-[node name="Password" type="LineEdit" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
+[node name="Password" type="LineEdit" parent="GUI/ConnectWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -452,7 +452,7 @@ placeholder_text = "Password"
 max_length = 16
 secret = true
 
-[node name="Password2" type="LineEdit" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
+[node name="Password2" type="LineEdit" parent="GUI/ConnectWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -469,7 +469,7 @@ placeholder_text = "Repeat Password"
 max_length = 16
 secret = true
 
-[node name="Register" type="Button" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
+[node name="Register" type="Button" parent="GUI/ConnectWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -484,7 +484,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Register"
 
-[node name="Back" type="Button" parent="GUI/JoinWindows/RegistrationWindow/Panel"]
+[node name="Back" type="Button" parent="GUI/ConnectWindows/RegistrationWindow/Panel"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -500,7 +500,8 @@ grow_vertical = 2
 text = "Back
 "
 
-[node name="ErrorLabel" type="Label" parent="GUI/JoinWindows"]
+[node name="ErrorLabel" type="Label" parent="GUI/ConnectWindows"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

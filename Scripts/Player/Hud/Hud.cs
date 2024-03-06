@@ -22,6 +22,8 @@ public partial class Hud : MarginContainer
         pingingIndicatorTimer.AutoReset = false;
 
         pingingIndicatorTimer.Start();
+
+        SetConnectionStatusText(0);
     }
     public void PingReceived()
     {
