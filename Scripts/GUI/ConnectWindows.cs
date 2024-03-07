@@ -138,6 +138,9 @@ public partial class ConnectWindows : Control
             case 6:
                 connectionErrorLabel.Text = "Username is already taken."; // in registration
                 return false;
+            case 7:
+                connectionErrorLabel.Text = "Server is full.";
+                return false;
         }
         return false;
     }

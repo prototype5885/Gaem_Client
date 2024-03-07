@@ -151,7 +151,7 @@ public partial class PlayersManager : Node3D
             {
                 Thread.Sleep(Client.tickrate);
                 string jsonData = JsonSerializer.Serialize(localPlayer, PlayerPositionContext.Default.PlayerPosition);
-                await PacketProcessor.SendTcp(3, jsonData);
+                await PacketProcessor.SendUdp(3, jsonData);
             }
         }
         catch

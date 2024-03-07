@@ -44,8 +44,6 @@ script = ExtResource("1_xlpas")
 [node name="MultiplayerManager" type="Node" parent="."]
 script = ExtResource("2_7pnnp")
 
-[node name="PacketProcessor" type="Node" parent="MultiplayerManager"]
-
 [node name="PlayersManager" type="Node3D" parent="."]
 script = ExtResource("2_5b6b8")
 

@@ -1,4 +1,4 @@
-﻿//using Godot;
+//using Godot;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,11 +20,11 @@ public static class PacketProcessor
         //CalculateLatency.sentBytesPerSecond += messageBytes.Length;
         await Client.tcpStream.WriteAsync(messageBytes);
     }
-    public static async Task SendUdp(byte commandType, string message, EndPoint udpEndpoint)
+    public static async Task SendUdp(byte commandType, string message)
     {
         byte[] messageBytes = EncodeMessage(commandType, message);
         //CalculateLatency.sentBytesPerSecond += messageBytes.Length;
-        await Client.clientUdpSocket.SendToAsync(messageBytes, SocketFlags.None, udpEndpoint);
+        await Client.clientUdpSocket.SendAsync(messageBytes, SocketFlags.None);
     }
     public static async Task ReceiveTcpData()
     {
