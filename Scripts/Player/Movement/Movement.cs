@@ -4,39 +4,39 @@ using static Godot.TextServer;
 
 public partial class Movement : CharacterBody3D
 {
-    Camera3D camera;
+    private Camera3D camera;
 
     // speed multipliers
-    const float default_speed = 4.0f;
-    float sprint_speed_multiplier = 1f;
+    private const float default_speed = 4.0f;
+    private float sprint_speed_multiplier = 1f;
 
-    float total_speed_multiplier;
+    private float total_speed_multiplier;
 
     // acceleration
-    const float accel_default = 10f;
-    const float accel_air = 1f;
-    float accel = accel_default;
+    private const float accel_default = 10f;
+    private const float accel_air = 1f;
+    private float accel = accel_default;
 
     // input
-    Vector3 direction;
-    float h_rot;
-    float f_input;
-    float h_input;
+    private Vector3 direction;
+    private float h_rot;
+    private float f_input;
+    private float h_input;
 
     // tilt
-    float target_tilt;
-    float current_tilt = 0f;
+    private float target_tilt;
+    private float current_tilt = 0f;
 
     // normalized speed
-    float movementspeed;
+    private float movementspeed;
 
     // gravity
-    float gravity = 9.8f;
-    float gravity_multiplier = 1f;
+    private float gravity = 9.8f;
+    private float gravity_multiplier = 1f;
 
-    bool falling = false;
+    private bool falling = false;
 
-    bool canMove = true;
+    private bool canMove = true;
 
     public override void _Ready()
     {
@@ -72,7 +72,8 @@ public partial class Movement : CharacterBody3D
             }
         }
     }
-    void _player_controls_enabled(bool input)
+
+    private void _player_controls_enabled(bool input)
     {
         SetProcessInput(input);
         canMove = input;
@@ -84,7 +85,8 @@ public partial class Movement : CharacterBody3D
 
 
     }
-    void movement(float delta)
+
+    private void movement(float delta)
     {
         // declares local velocity to be able to modify it
         Vector3 localVelocity = Velocity;
@@ -133,7 +135,8 @@ public partial class Movement : CharacterBody3D
         // sets calculated local velocity as real velocity
         Velocity = localVelocity;
     }
-    void change_speed()
+
+    private void change_speed()
     {
         total_speed_multiplier = default_speed * sprint_speed_multiplier;
     }

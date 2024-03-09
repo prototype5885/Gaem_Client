@@ -3,33 +3,25 @@ using System.Text;
 using System.Threading.Tasks;
 public partial class Chat : Panel
 {
-    PackedScene chatMessageScene;
-    bool SpamCooldownEnded = true;
-    Node clientDataManager;
+    private static readonly PackedScene chatMessageScene = GD.Load<PackedScene>("res://Components/chat/chatMessage.tscn");
+    private static bool SpamCooldownEnded = true;
 
-    LineEdit inputChat;
-    Panel inputPanel;
-    MarginContainer messagesMargin;
-    Timer hideChatTimer;
-    VBoxContainer messages;
-    Timer spamTimer;
-
-    GUI GUI;
-
-    Client client;
+    private static LineEdit inputChat;
+    private static Panel inputPanel;
+    private static MarginContainer messagesMargin;
+    private static Timer hideChatTimer;
+    private static VBoxContainer messages;
+    private static Timer spamTimer;
 
     public override void _Ready()
     {
         // init
-        chatMessageScene = GD.Load<PackedScene>("res://Components/chat/chatMessage.tscn");
         inputChat = GetNode<LineEdit>("%InputChat");
         inputPanel = GetNode<Panel>("%InputPanel");
         messagesMargin = GetChild<MarginContainer>(0);
         hideChatTimer = GetChild<Timer>(1);
         messages = messagesMargin.GetChild<VBoxContainer>(0);
         spamTimer = GetNode<Timer>("%SpamTimer");
-        GUI = GetParent<GUI>();
-        client = GetNode<Client>("/root/Map/MultiplayerManager");
         // end
 
         //inputChat.Visible = false;
@@ -68,9 +60,9 @@ public partial class Chat : Panel
     //        CleanMessage();
     //    }
     //}
-    void StartTyping()
+    private void StartTyping()
     {
-        GUI.PlayerControlsEnabled(false); // disable controls for player
+        NodeManager.gui.PlayerControlsEnabled(false); // disable controls for player
         messagesMargin.Visible = true;
         inputPanel.Visible = true;
 
@@ -80,11 +72,10 @@ public partial class Chat : Panel
         inputChat.Editable = true;
         inputChat.GrabFocus();
 
-        //inputChat.Text = "wtf"; // resets the chat message so it wont include letter t
-
         Input.MouseMode = Input.MouseModeEnum.Visible;
     }
-    void PrepareMessage(string message)
+
+    private void PrepareMessage(string message)
     {
         if (message != "")
         {
@@ -95,9 +86,10 @@ public partial class Chat : Panel
         }
         CleanMessage();
     }
-    void CleanMessage()
+
+    private void CleanMessage()
     {
-        GUI.PlayerControlsEnabled(true); // enable controls for player
+        NodeManager.gui.PlayerControlsEnabled(true); // enable controls for player
         inputChat.PlaceholderText = "Press enter to Chat";
         hideChatTimer.Start();
         inputChat.Text = "";
@@ -108,30 +100,31 @@ public partial class Chat : Panel
         inputPanel.Visible = false;
         inputChat.Editable = false;
     }
+    
+    public static void AddChatMessageToChatWindow(ChatMessage chatMessage)
+    {
+        HBoxContainer chatMessageLine = chatMessageScene.Instantiate<HBoxContainer>(); // instantiates the component that displays message
+    
+        chatMessageLine.GetChild<Label>(0).Text = chatMessage.i.ToString();
+        chatMessageLine.GetChild<Label>(2).Text = chatMessage.m;
+    
+        messages.AddChild(chatMessageLine, true);
+    
+        if (messages.GetChildCount() > 10)
+        {
+            messages.GetChild(0).QueueFree();
+        }
+    
+        messagesMargin.Visible = true;
+        hideChatTimer.Start();
+    }
 
-    //[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    //void SendMessage(string message)
-    //{
-    //    HBoxContainer chatMessage = chatMessageScene.Instantiate<HBoxContainer>();
-
-    //    chatMessage.GetNode<Label>("Message").Text = message;
-    //    chatMessage.GetNode<Label>("Name").Text = Multiplayer.GetRemoteSenderId().ToString();
-
-    //    messages.AddChild(chatMessage, true);
-
-    //    if (messages.GetChildCount() > 10)
-    //    {
-    //        messages.GetChild(0).QueueFree();
-    //    }
-
-    //    messagesMargin.Visible = true;
-    //    hideChatTimer.Start();
-    //}
-    void _on_spam_timer_timeout()
+    private void _on_spam_timer_timeout()
     {
         SpamCooldownEnded = true;
     }
-    void _on_input_chat_gui_input(InputEvent @event)
+
+    private void _on_input_chat_gui_input(InputEvent @event)
     {
         //if (@event is InputEventMouseButton)
         //{
@@ -141,7 +134,8 @@ public partial class Chat : Panel
         //    }
         //}
     }
-    void _on_hide_chat_timer_timeout()
+
+    private void _on_hide_chat_timer_timeout()
     {
         messagesMargin.Visible = false;
         inputPanel.Visible = false;

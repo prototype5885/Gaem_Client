@@ -3,33 +3,33 @@ using System;
 
 public partial class ConnectWindows : Control
 {
-    static string ip = "";
-    static int port = 0;
+    private static string ip = "";
+    private static int port = 0;
 
     public static bool loginOrRegister; // this is needed so when server sends back response about authentication, the authenticator will know
 
-    static Godot.Collections.Array<Godot.Node> children;
+    private static Godot.Collections.Array<Godot.Node> children;
 
     //static GUI gui;
 
-    static Label connectionErrorLabel;
+    private static Label connectionErrorLabel;
 
-    static Control addressWindow;
-    static Control loginWindow;
-    static Control registrationWindow;
+    private static Control addressWindow;
+    private static Control loginWindow;
+    private static Control registrationWindow;
 
     // login
-    static LineEdit loginUsernameInput;
-    static LineEdit loginPasswordInput;
+    private static LineEdit loginUsernameInput;
+    private static LineEdit loginPasswordInput;
 
     // registration
-    static LineEdit registrationUsernameInput;
-    static LineEdit firstPasswordInput;
-    static LineEdit secondPasswordInput;
+    private static LineEdit registrationUsernameInput;
+    private static LineEdit firstPasswordInput;
+    private static LineEdit secondPasswordInput;
 
     // address window
-    static LineEdit inputIP;
-    static LineEdit inputPort;
+    private static LineEdit inputIP;
+    private static LineEdit inputPort;
 
     public override void _Ready()
     {
@@ -73,7 +73,8 @@ public partial class ConnectWindows : Control
         // reads the server address, which in turns opens the login window on start
         ChangeServerAddress();
     }
-    static void Login()
+
+    private static void Login()
     {
         loginOrRegister = true;
 
@@ -82,7 +83,8 @@ public partial class ConnectWindows : Control
 
         Client.Connect(ip, port, username, password);
     }
-    static void Register()
+
+    private static void Register()
     {
         loginOrRegister = false;
 
@@ -119,7 +121,7 @@ public partial class ConnectWindows : Control
             case 0:
                 connectionErrorLabel.Text = "Failed to connect to the server.";
                 return false;
-            case 1: // successfull login or registration
+            case 1: // successful login or registration
                 CloseAllConnectWindows();
                 NodeManager.gui.PlayerControlsEnabled(true);
                 return true;
@@ -144,7 +146,8 @@ public partial class ConnectWindows : Control
         }
         return false;
     }
-    static void ChangeWindow(byte window)
+
+    private static void ChangeWindow(byte window)
     {
         CloseAllConnectWindows();
         switch (window)
@@ -160,7 +163,8 @@ public partial class ConnectWindows : Control
                 break;
         }
     }
-    static void ChangeServerAddress()
+
+    private static void ChangeServerAddress()
     {
         if (!int.TryParse(inputPort.Text, out int parsedPort))
         {
@@ -173,7 +177,8 @@ public partial class ConnectWindows : Control
 
         ChangeWindow(1);
     }
-    static void CloseAllConnectWindows()
+
+    private static void CloseAllConnectWindows()
     {
         foreach (Control window in children)
         {

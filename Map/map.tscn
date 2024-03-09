@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=20 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
 [ext_resource type="Script" path="res://Scripts/NodeManager.cs" id="1_xlpas"]
@@ -36,7 +36,10 @@ size = Vector2(10, 10)
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_t5kq2"]
 data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0, -5)
 
-[sub_resource type="BoxMesh" id="BoxMesh_wkol4"]
+[sub_resource type="BoxMesh" id="BoxMesh_vglpi"]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_qupme"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
 
 [node name="Map" type="Node3D"]
 script = ExtResource("1_xlpas")
@@ -46,10 +49,6 @@ script = ExtResource("2_7pnnp")
 
 [node name="PlayersManager" type="Node3D" parent="."]
 script = ExtResource("2_5b6b8")
-
-[node name="LocalPlayer" type="Node3D" parent="PlayersManager"]
-
-[node name="OtherPlayers" type="Node3D" parent="PlayersManager"]
 
 [node name="HUD" type="MarginContainer" parent="."]
 anchors_preset = 15
@@ -91,18 +90,12 @@ offset_bottom = 29.0
 grow_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_pt5bo")
 
-[node name="ReceivedData" type="Label" parent="HUD/Debug"]
+[node name="PlayersInfo" type="Label" parent="HUD/Debug"]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -474.0
-offset_top = 127.0
-offset_bottom = 161.0
-grow_horizontal = 0
+offset_right = 988.0
+offset_bottom = 576.0
 theme_override_font_sizes/font_size = 24
-text = "ReceivedData"
-horizontal_alignment = 2
+text = "PlayersInfo"
 
 [node name="LatencyLabel" type="Label" parent="HUD/Debug"]
 layout_mode = 1
@@ -115,10 +108,6 @@ grow_horizontal = 0
 theme_override_font_sizes/font_size = 24
 text = "Ping"
 horizontal_alignment = 2
-
-[node name="Info" type="Label" parent="HUD"]
-layout_mode = 2
-text = "faf"
 
 [node name="GUI" type="Control" parent="."]
 layout_mode = 3
@@ -538,9 +527,14 @@ visible = false
 [node name="TimeLoop" type="Timer" parent="."]
 autostart = true
 
-[node name="OnlineObject" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.938625, -1.85565)
-mesh = SubResource("BoxMesh_wkol4")
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.395958, -1.28132)
+mesh = SubResource("BoxMesh_vglpi")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D2/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_qupme")
 
 [connection signal="timeout" from="GUI/Chat/HideChatTimer" to="GUI/Chat" method="_on_hide_chat_timer_timeout"]
 [connection signal="gui_input" from="GUI/Chat/InputContainer/MarginContainer/InputChat" to="GUI/Chat" method="_on_input_chat_gui_input"]

@@ -9,7 +9,7 @@ public partial class Hud : MarginContainer
 
     public Label latencyLabel;
 
-    System.Timers.Timer pingingIndicatorTimer = new System.Timers.Timer(250);
+    private System.Timers.Timer pingingIndicatorTimer = new System.Timers.Timer(250);
     public override void _Ready()
     {
         statusLabel = GetNode<Label>("Debug/StatusLabel");
@@ -30,11 +30,13 @@ public partial class Hud : MarginContainer
         CallDeferred(nameof(ChangePingingIndicatorVisibility), true);
         pingingIndicatorTimer.Start();
     }
-    void PingingIndicatorExpired(object sender, ElapsedEventArgs e)
+
+    private void PingingIndicatorExpired(object sender, ElapsedEventArgs e)
     {
         CallDeferred(nameof(ChangePingingIndicatorVisibility), false);
     }
-    static void ChangePingingIndicatorVisibility(bool visible)
+
+    private static void ChangePingingIndicatorVisibility(bool visible)
     {
         //if (visible == false)
         //{

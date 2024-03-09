@@ -5,15 +5,15 @@ using System.Text;
 
 public static class Encryption
 {
-    public static byte[] encryptionKey = Encoding.ASCII.GetBytes("0123456789ABCDEF0123456789ABCDEF");
-    const byte ivLength = 16;
+    public static byte[] encryptionKey = Encoding.UTF8.GetBytes("0123456789ABCDEF0123456789ABCDEF");
+    private const byte ivLength = 16;
     public static bool encryption = true;
 
     public static byte[] Encrypt(string message)
     {
         try
         {
-            byte[] unencryptedBytes = Encoding.ASCII.GetBytes(message);
+            byte[] unencryptedBytes = Encoding.UTF8.GetBytes(message);
             byte[] randomIV = new byte[16]; // creates a byte array of 16 length for IV
 
             using (RandomNumberGenerator rng = RandomNumberGenerator.Create())

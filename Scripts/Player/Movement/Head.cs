@@ -3,18 +3,18 @@ using System;
 
 public partial class Head : Camera3D
 {
-    CharacterBody3D playerController;
+    private CharacterBody3D playerController;
 
     // mouselook
-    [Export] float mouse_sens = 1.5f;
+    [Export] private float mouse_sens = 1.5f;
     public float mouse_sens_multiplier = 1f;
 
-    float player_rotation_horizontal = 0f;
-    float player_rotation_vertical = 0f;
+    private float player_rotation_horizontal = 0f;
+    private float player_rotation_vertical = 0f;
 
-    float vertical_clamp_angle;
+    private float vertical_clamp_angle;
 
-    float playerFOV;
+    private float playerFOV;
 
     public override void _Ready()
     {
@@ -39,7 +39,8 @@ public partial class Head : Camera3D
             Rotation = Rotation with { X = Mathf.Clamp(Rotation.X, -vertical_clamp_angle, vertical_clamp_angle) };
         }
     }
-    void PlayerControlsEnabled(bool input)
+
+    private void PlayerControlsEnabled(bool input)
     {
         SetProcessInput(input);
     }
