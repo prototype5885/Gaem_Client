@@ -30,7 +30,9 @@ public static class PacketProcessor
             byte[] buffer = new byte[4096];
             while (!cancellationToken.IsCancellationRequested)
             {
+                
                 int bytesRead = await Client.tcpStream.ReadAsync(new ArraySegment<byte>(buffer), cancellationToken);
+                GD.Print("Bytes read:" + bytesRead);
                 //CalculateLatency.receivedBytesPerSecond += bytesRead;
                 Packet[] packets = ProcessBuffer(buffer, bytesRead);
                 ProcessPackets(packets);
@@ -78,15 +80,14 @@ public static class PacketProcessor
         {
             byte[] receivedBytes = new byte[byteLength];
             Array.Copy(buffer, receivedBytes, byteLength);
-
             receivedBytesInString = Encryption.Decrypt(receivedBytes);
+
         }
         else // runs if encryption is disabled
         {
             receivedBytesInString = Encoding.UTF8.GetString(buffer, 0, byteLength);
         }
-
-        //GD.Print(receivedBytesInString);
+        GD.Print(receivedBytesInString);
 
         string packetTypePattern = @"#(.*)#"; // pattern to read the packet type
         string packetDataPattern = @"\$(.*?)\$"; // pattern to read the packet data
@@ -147,8 +148,7 @@ public static class PacketProcessor
                 case 4:
                     PlayerData[] playerDataArray = JsonSerializer.Deserialize<PlayerData[]>(packet.data);
                     GD.Print($"PlayerData[] received from server, array length: {playerDataArray.Length}");
-                    NodeManager.playersManager.UpdateDataOfEveryPlayers(playerDataArray);
-                    Client.PlayerDataArrived();
+                    Client.PlayerDataArrived(playerDataArray);
                     break;
             }
         }

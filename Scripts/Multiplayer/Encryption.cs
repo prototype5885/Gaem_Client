@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Godot;
+using RandomNumberGenerator = System.Security.Cryptography.RandomNumberGenerator;
 
 public static class Encryption
 {

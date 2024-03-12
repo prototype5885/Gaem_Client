@@ -28,6 +28,11 @@ public partial class Client : Node
 
     private static bool receivedInitialData;
 
+    // public override void _Process(double delta)
+    // {
+    //     GD.Print(tcpStream);
+    // }
+    
     public static async void Connect(string serverIpAddressString, int port, string username, string password)
     {
         try
@@ -92,21 +97,21 @@ public partial class Client : Node
             ownIndex = initialData.i;
             players = new Player[maxPlayers];
 
-            // NodeManager.playersManager.UpdateDataOfEveryPlayers(initialData.pda);
+            NodeManager.playersManager.UpdateDataOfEveryPlayers(initialData.pda);
 
-
+            Task.Run(() => PlayersManager.SendPositionToServer());
+            GD.Print("Sending position to the server");
+            Task.Run(() => PacketProcessor.ReceiveUdpData());
+            GD.Print("Started ReceiveUdpData");
 
             receivedInitialData = true;
             SetConnectionStatus(1);
         }
     }
 
-    public static void PlayerDataArrived()
+    public static void PlayerDataArrived(PlayerData[] playerDataArray)
     {
-        Task.Run(() => PlayersManager.SendPositionToServer());
-        GD.Print("Sending position to the server");
-        Task.Run(() => PacketProcessor.ReceiveUdpData());
-        GD.Print("Started ReceiveUdpData");
+        NodeManager.playersManager.UpdateDataOfEveryPlayers(playerDataArray);
     }
     private static void SetConnectionStatus(byte newStatus)
     {
