@@ -48,13 +48,9 @@ public partial class Client : Node
             // connects to udp server
             await clientUdpSocket.ConnectAsync(serverIpAddress, port + 1);
             // IPEndPoint localUdpEndpoint = (IPEndPoint)clientUdpSocket.LocalEndPoint;
-
-            string hashedPassword;
-            using (var sha = SHA512.Create())
-            {
-                byte[] hashedBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password + "secretxd"));
-                hashedPassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
-            }
+            
+            byte[] hashedBytes = SHA512.HashData(Encoding.UTF8.GetBytes(password + "secretxd"));
+            string hashedPassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
 
             // Sends username / pass to server
             string jsonData = JsonSerializer.Serialize
