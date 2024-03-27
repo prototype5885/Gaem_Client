@@ -2,12 +2,13 @@
 
 public class LoginData
 {
-    public bool lr { get; set; } // True if login, false if register
+    public bool reg { get; set; } // True if login, false if register
     public string un { get; set; } // Username
     public string pw { get; set; } // Password
 }
 public class PlayerPosition
 {
+    public int i { get; set; } // index of player
     public float x { get; set; } // Player position X
     public float y { get; set; } // Player position Y
     public float z { get; set; } // Player position Z
@@ -23,7 +24,7 @@ public class PlayerPosition
 }
 public class InitialData
 {
-    public byte lr { get; set; } // login result, response to the client about how the login went
+    public byte rv { get; set; } // login result, response to the client about how the login went
     public byte i { get; set; } // client index so player knows what slot he/she/it is in
     public byte mp { get; set; } // max player amount so client will also know it
     public int tr { get; set; } // tick rate

@@ -4,11 +4,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 
-
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ProToTypeLounge.Scripts.Multiplayer;
 
 public partial class Client : Node
 {
@@ -28,13 +28,14 @@ public partial class Client : Node
 
     private static bool receivedInitialData;
 
-    // public override void _Process(double delta)
-    // {
-    //     GD.Print(tcpStream);
-    // }
+    public override void _Ready()
+    {
+        SetProcess(false);
+    }
     
     public static async void Connect(string serverIpAddressString, int port, string username, string password)
     {
+        // Connect or register button is pressed here
         try
         {
             if (serverIpAddressString == "localhost") { serverIpAddressString = "127.0.0.1"; }
@@ -47,9 +48,8 @@ public partial class Client : Node
 
             // connects to udp server
             await clientUdpSocket.ConnectAsync(serverIpAddress, port + 1);
-            // IPEndPoint localUdpEndpoint = (IPEndPoint)clientUdpSocket.LocalEndPoint;
             
-            byte[] hashedBytes = SHA512.HashData(Encoding.UTF8.GetBytes(password + "secretxd"));
+            byte[] hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
             string hashedPassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
 
             // Sends username / pass to server
@@ -57,16 +57,16 @@ public partial class Client : Node
             (
                 new LoginData
                 {
-                    lr = ConnectWindows.loginOrRegister,
+                    reg = ConnectWindows.wantingToRegister,
                     un = username,
                     pw = hashedPassword
                 }
             );
-            await PacketProcessor.SendTcp(1, jsonData);
+            await SendPacket.SendTcp(1, jsonData);
 
             GD.Print("Sent login data to the server");
 
-            await PacketProcessor.ReceiveTcpData(); // starts receiving tcp data from the server, this will stay on for as long as the client is connected to the server
+            await ReceivePacket.ReceiveTcpData(); // starts receiving tcp data from the server, this will stay on for as long as the client is connected to the server
         }
         catch // Runs if there is no connection to the server
         {
@@ -78,13 +78,8 @@ public partial class Client : Node
     public static void Authentication(InitialData initialData) // runs when player received the initial data from the server after connection
     {
         if (receivedInitialData) return; // stops if for some reason server would send initial data multiple times
-        // bool loginSuccessful = false; 
-        // if (ConnectWindows.loginOrRegister) // Runs if wanting to login
-        //     loginSuccessful = ConnectWindows.ConnectionResult(initialData.lr);
-        // else 
-        //     loginSuccessful = ConnectWindows.ConnectionResult(initialData.lr); // Runs if wanting to register
 
-        if (ConnectWindows.ConnectionResult(initialData.lr)) // runs if login was successful
+        if (ConnectWindows.ConnectionResult(initialData.rv)) // runs if login was successful
         {
             GD.Print("Authentication successful");
 
@@ -95,9 +90,9 @@ public partial class Client : Node
 
             NodeManager.playersManager.UpdateDataOfEveryPlayers(initialData.pda);
 
-            Task.Run(() => PlayersManager.SendPositionToServer());
+            Task.Run(PlayersManager.SendPositionToServer);
             GD.Print("Sending position to the server");
-            Task.Run(() => PacketProcessor.ReceiveUdpData());
+            Task.Run(ReceivePacket.ReceiveUdpData);
             GD.Print("Started ReceiveUdpData");
 
             receivedInitialData = true;

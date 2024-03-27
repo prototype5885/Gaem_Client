@@ -6,7 +6,7 @@ public partial class ConnectWindows : Control
     private static string ip = "";
     private static int port = 0;
 
-    public static bool loginOrRegister; // this is needed so when server sends back response about authentication, the authenticator will know
+    public static bool wantingToRegister = false; // this is needed so when server sends back response about authentication, the authenticator will know
 
     private static Godot.Collections.Array<Godot.Node> children;
 
@@ -76,8 +76,6 @@ public partial class ConnectWindows : Control
 
     private static void Login()
     {
-        loginOrRegister = true;
-
         string username = loginUsernameInput.Text;
         string password = loginPasswordInput.Text;
 
@@ -86,7 +84,7 @@ public partial class ConnectWindows : Control
 
     private static void Register()
     {
-        loginOrRegister = false;
+        wantingToRegister = true;
 
         string username = registrationUsernameInput.Text;
         string password = firstPasswordInput.Text;

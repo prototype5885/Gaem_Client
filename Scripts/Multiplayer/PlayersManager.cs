@@ -1,56 +1,59 @@
-using Godot;
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using Godot;
+using ProToTypeLounge.Scripts.Multiplayer;
 
 public partial class PlayersManager : Node3D
 {
     private static readonly PackedScene playerScene = GD.Load<PackedScene>("res://Components/Player.tscn");
     private static readonly PackedScene puppetPlayerScene = GD.Load<PackedScene>("res://Components/PuppetPlayer.tscn");
 
-    private static bool interpolatePuppetPositions = false;
+    private static readonly bool interpolatePuppetPositions = false;
 
-    private static float interpolationSpeed = 4f;
-    
+    private static readonly float interpolationSpeed = 4f;
+
     public override void _Ready()
     {
         SetProcess(false);
     }
+
     public override void _Process(double delta)
     {
         InterpolatePuppetPlayersPosition((float)delta);
         Client.players[Client.ownIndex].ConvertLocalPositionToServerFormat();
-        
+
         string playersInfo = "";
         foreach (Player player in Client.players)
-        {
-            if (player == null) playersInfo += "Free\n";
-            else playersInfo += player.ToString() + "\n";
-            
-        }
+            if (player == null) continue;
+            // if (player == null) playersInfo += "Free\n";
+            else playersInfo += player + "\n";
 
         NodeManager.playersInfo.Text = playersInfo;
     }
+
     public void UpdateDataOfEveryPlayers(PlayerData[] playerDataArray)
     {
         for (byte index = 0; index < Client.maxPlayers; index++)
-        {
-            if (playerDataArray[index] != null && Client.players[index] == null) // runs if slot is occupied on server and no puppet exist locally on that slot
+            if (playerDataArray[index] != null &&
+                Client.players[index] ==
+                null) // runs if slot is occupied on server and no puppet exist locally on that slot
             {
                 if (index == Client.ownIndex) // adds player to the array if player is local player
                 {
                     CharacterBody3D playerCharacter = playerScene.Instantiate() as CharacterBody3D;
                     AddChild(playerCharacter);
-                    
-                    Client.players[index] = new Player 
+
+                    Client.players[index] = new Player
                     {
                         localPlayer = true,
                         playerName = playerDataArray[index].un,
                         body = playerCharacter,
-                        head = playerCharacter.GetChild<Node3D>(0),
-                    }; 
-                    Client.players[index].body.Position = new Godot.Vector3(0f, 3f, 0f); // positions above the map
+                        head = playerCharacter.GetChild<Node3D>(0)
+                    };
+                    Client.players[index].body.Position = new Vector3(0f, 3f, 0f); // positions above the map
                     GD.Print($"Added local player to player array, index {index}");
                     SetProcess(true);
                 }
@@ -69,7 +72,7 @@ public partial class PlayersManager : Node3D
                         nameIndicator = playerCharacter.GetNode<Label3D>("Name")
                     };
                     Client.players[index].UpdateNameIndicator();
-                    Client.players[index].body.Position = new Godot.Vector3(0f, 3f, 0f); // positions above the map
+                    Client.players[index].body.Position = new Vector3(0f, 3f, 0f); // positions above the map
                 }
             }
             else if (playerDataArray[index] == null) // runs if slot on server is empty but a puppet exists locally
@@ -77,19 +80,24 @@ public partial class PlayersManager : Node3D
                 GD.Print($"Deleted player index {index} from player array");
                 Client.players[index] = null;
             }
-        }
+
         GD.Print("Ran UpdateDataOfEveryPlayers");
     }
-    public static void UpdateOtherPlayersPosition(PlayerPosition[] everyPlayersPosition) // updates the position of players when received data from server
+
+    public static void
+        UpdateOtherPlayersPosition(
+            List<PlayerPosition> everyPlayersPosition) // updates the position of players when received data from server
     {
-        for (byte i = 0; i < Client.maxPlayers; i++)
+        foreach (PlayerPosition playerPosition in everyPlayersPosition)
         {
-            if (Client.players[i] == null) continue;
-            if (i == Client.ownIndex) continue;
-            Client.players[i].serverPosition = everyPlayersPosition[i];
+            if (playerPosition.i == Client.ownIndex) continue;
+            Client.players[playerPosition.i].serverPosition = playerPosition;
         }
     }
-    private static void InterpolatePuppetPlayersPosition(float delta) // using the latest position, moves the player puppets to the new positions
+
+    private static void
+        InterpolatePuppetPlayersPosition(
+            float delta) // using the latest position, moves the player puppets to the new positions
     {
         try
         {
@@ -99,11 +107,15 @@ public partial class PlayersManager : Node3D
                 if (Client.players[i] == null) continue; // skips if no puppet in the slot
                 if (Client.players[i].localPlayer) continue; // skips if slot is local player
 
-                PlayerPosition playerPosition = Client.players[i].serverPosition; // assigns to local value, for easier readability
-                
-                Vector3 puppetPosition = Client.players[i].body.Position; // assigns to local value, for easier readability
-                Vector3 puppetRotation = Client.players[i].body.Rotation; // assigns to local value, for easier readability
-                Vector3 puppetHeadRotation = Client.players[i].head.Rotation; // assigns to local value, for easier readability
+                PlayerPosition
+                    playerPosition = Client.players[i].serverPosition; // assigns to local value, for easier readability
+
+                Vector3 puppetPosition =
+                    Client.players[i].body.Position; // assigns to local value, for easier readability
+                Vector3 puppetRotation =
+                    Client.players[i].body.Rotation; // assigns to local value, for easier readability
+                Vector3 puppetHeadRotation =
+                    Client.players[i].head.Rotation; // assigns to local value, for easier readability
 
                 if (interpolatePuppetPositions) // if interpolation is on
                 {
@@ -111,12 +123,17 @@ public partial class PlayersManager : Node3D
                     puppetPosition.Y = Mathf.Lerp(puppetPosition.Y, playerPosition.y, speed);
                     puppetPosition.Z = Mathf.Lerp(puppetPosition.Z, playerPosition.z, speed);
 
-                    puppetRotation.Y = Mathf.LerpAngle(puppetRotation.Y, playerPosition.ry, speed); // Rotates the puppet body only on Y angle
-                    puppetHeadRotation.X = Mathf.LerpAngle(puppetHeadRotation.X, playerPosition.rx, speed); // Rotates the puppet head only on X angle
+                    puppetRotation.Y =
+                        Mathf.LerpAngle(puppetRotation.Y, playerPosition.ry,
+                            speed); // Rotates the puppet body only on Y angle
+                    puppetHeadRotation.X =
+                        Mathf.LerpAngle(puppetHeadRotation.X, playerPosition.rx,
+                            speed); // Rotates the puppet head only on X angle
                 }
                 else // if interpolation is off
                 {
-                    puppetPosition = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z); // Position of the puppet
+                    puppetPosition =
+                        new Vector3(playerPosition.x, playerPosition.y, playerPosition.z); // Position of the puppet
                     puppetRotation.Y = playerPosition.ry; // Rotates the puppet body only on Y angle
                     puppetHeadRotation.X = playerPosition.rx; // Rotates the puppet head only on X angle
                 }
@@ -130,26 +147,15 @@ public partial class PlayersManager : Node3D
         {
             Console.WriteLine(e);
         }
-       
     }
+
     public static async Task SendPositionToServer()
     {
-        try
+        while (true)
         {
-            while (true)
-            {
-                Thread.Sleep(Client.tickRate);
-                string jsonData = JsonSerializer.Serialize(Client.players[Client.ownIndex].serverPosition);
-                await PacketProcessor.SendUdp(3, jsonData);
-            }
-        }
-        catch (Exception ex)
-        {
-            // GD.Print("Error sending player position to server");
-            GD.Print(ex);
+            Thread.Sleep(Client.tickRate);
+            string jsonData = JsonSerializer.Serialize(Client.players[Client.ownIndex].serverPosition);
+            await SendPacket.SendUdp(3, jsonData);
         }
     }
 }
-
-
-

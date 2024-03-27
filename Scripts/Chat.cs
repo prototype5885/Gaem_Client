@@ -1,6 +1,8 @@
 using Godot;
 using System.Text;
 using System.Threading.Tasks;
+using ProToTypeLounge.Scripts.Multiplayer;
+
 public partial class Chat : Panel
 {
     private static readonly PackedScene chatMessageScene = GD.Load<PackedScene>("res://Components/chat/chatMessage.tscn");
@@ -79,7 +81,7 @@ public partial class Chat : Panel
     {
         if (message != "")
         {
-            Task.Run(() => PacketProcessor.SendTcp(2, message));
+            Task.Run(() => SendPacket.SendTcp(2, message));
 
             SpamCooldownEnded = false;
             spamTimer.Start();

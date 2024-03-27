@@ -1,9 +1,10 @@
-[gd_scene load_steps=20 format=3 uid="uid://kig6msmcak75"]
+[gd_scene load_steps=21 format=3 uid="uid://kig6msmcak75"]
 
 [ext_resource type="Theme" uid="uid://cjaqougjtxp06" path="res://Etc/Menu.tres" id="1_k5sxp"]
 [ext_resource type="Script" path="res://Scripts/NodeManager.cs" id="1_xlpas"]
 [ext_resource type="Script" path="res://Scripts/Multiplayer/PlayersManager.cs" id="2_5b6b8"]
 [ext_resource type="Script" path="res://Scripts/Multiplayer/Client.cs" id="2_7pnnp"]
+[ext_resource type="Script" path="res://Scripts/FPS.gd" id="5_bhtkx"]
 [ext_resource type="Script" path="res://Scripts/Chat.cs" id="6_0bml2"]
 [ext_resource type="Script" path="res://Scripts/GUI/GUI.cs" id="6_tmkbl"]
 [ext_resource type="Script" path="res://Scripts/GUI/ConnectWindows.cs" id="7_7rbfv"]
@@ -92,6 +93,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_pt5bo")
 
 [node name="PlayersInfo" type="Label" parent="HUD/Debug"]
 layout_mode = 1
+offset_top = 74.0
 offset_right = 988.0
 offset_bottom = 576.0
 theme_override_font_sizes/font_size = 24
@@ -108,6 +110,13 @@ grow_horizontal = 0
 theme_override_font_sizes/font_size = 24
 text = "Ping"
 horizontal_alignment = 2
+
+[node name="FPS" type="Label" parent="HUD/Debug"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "FPS"
+script = ExtResource("5_bhtkx")
 
 [node name="GUI" type="Control" parent="."]
 layout_mode = 3
@@ -246,7 +255,7 @@ offset_right = 86.0
 offset_bottom = -42.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "localhost"
+text = "127.0.0.1"
 placeholder_text = "IP Address"
 max_length = 32
 

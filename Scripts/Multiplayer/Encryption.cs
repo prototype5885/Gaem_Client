@@ -9,7 +9,7 @@ public static class Encryption
 {
     public static byte[] encryptionKey = Encoding.UTF8.GetBytes("0123456789ABCDEF0123456789ABCDEF");
     private const byte ivLength = 16;
-    public static bool encryption = true;
+    public static bool encryptionEnabled = true;
 
     public static byte[] Encrypt(string message)
     {
@@ -30,15 +30,20 @@ public static class Encryption
 
                 using (MemoryStream msEncrypt = new MemoryStream())
                 {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                    using (CryptoStream csEncrypt =
+                           new CryptoStream(msEncrypt, aes.CreateEncryptor(), CryptoStreamMode.Write))
                     {
                         csEncrypt.Write(unencryptedBytes, 0, unencryptedBytes.Length);
                         csEncrypt.FlushFinalBlock();
                         byte[] encryptedMessage = msEncrypt.ToArray();
 
-                        byte[] encryptedBytesWithIV = new byte[encryptedMessage.Length + ivLength]; // creates a byte array to store both the message and the iv
-                        Array.Copy(randomIV, encryptedBytesWithIV, ivLength); // copies the IV to the beginning of the array
-                        Array.Copy(encryptedMessage, 0, encryptedBytesWithIV, ivLength, encryptedMessage.Length); // copies the message after the IV
+                        byte[] encryptedBytesWithIV =
+                            new byte[encryptedMessage.Length +
+                                     ivLength]; // creates a byte array to store both the message and the iv
+                        Array.Copy(randomIV, encryptedBytesWithIV,
+                            ivLength); // copies the IV to the beginning of the array
+                        Array.Copy(encryptedMessage, 0, encryptedBytesWithIV, ivLength,
+                            encryptedMessage.Length); // copies the message after the IV
 
                         return encryptedBytesWithIV;
                     }
@@ -50,8 +55,8 @@ public static class Encryption
             Console.WriteLine(ex);
             return null;
         }
-
     }
+
     public static string Decrypt(byte[] encryptedMessageWithIV)
     {
         try
@@ -59,8 +64,10 @@ public static class Encryption
             byte[] extractedIV = new byte[ivLength]; // creates a byte array for the received IV
             Array.Copy(encryptedMessageWithIV, extractedIV, ivLength); // copies it in it
 
-            byte[] encryptedMessage = new byte[encryptedMessageWithIV.Length - ivLength]; // creates a byte array for the received message
-            Array.Copy(encryptedMessageWithIV, ivLength, encryptedMessage, 0, encryptedMessage.Length); // copes it in it
+            byte[] encryptedMessage =
+                new byte[encryptedMessageWithIV.Length - ivLength]; // creates a byte array for the received message
+            Array.Copy(encryptedMessageWithIV, ivLength, encryptedMessage, 0,
+                encryptedMessage.Length); // copes it in it
 
             using (Aes aes = Aes.Create())
             {
